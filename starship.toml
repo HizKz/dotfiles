@@ -1,0 +1,25 @@
+format = """
+${custom.dir_git}${custom.dir_nogit}$git_branch
+$character
+"""
+
+[custom.dir_git]
+command = 'basename "$PWD"'
+when = 'test "$PWD" != "$HOME" && git rev-parse --is-inside-work-tree >/dev/null 2>&1'
+style = "fg:white bg:blue"
+format = "[ $output ]($style)[](fg:blue bg:green)"
+
+[custom.dir_nogit]
+command = 'basename "$PWD"'
+when = 'test "$PWD" != "$HOME" && ! git rev-parse --is-inside-work-tree >/dev/null 2>&1'
+style = "fg:white bg:blue"
+format = "[ $output ]($style)[](fg:blue) "
+
+[git_branch]
+symbol = ""
+style = "fg:black bg:green"
+format = "[ $symbol $branch ]($style)[](fg:green) "
+
+[character]
+success_symbol = "[❯](bold green)"
+error_symbol = "[❯](bold red)"
