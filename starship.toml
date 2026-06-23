@@ -1,25 +1,51 @@
 format = """
-${custom.dir_git}${custom.dir_nogit}$git_branch
-$character
+$os$username$time${custom.dir_git}${custom.dir_nogit}$git_branch
+[╰─ ](fg:#7db5a8)$character
 """
 
+[os]
+disabled = false
+style = "fg:#20323a bg:#d7efe7"
+format = "[](fg:#d7efe7)[ $symbol ]($style)"
+
+[os.symbols]
+Macos = ""
+Ubuntu = ""
+Windows = ""
+Arch = ""
+Fedora = ""
+Debian = ""
+Unknown = ""
+
+[username]
+show_always = true
+style_user = "fg:#20323a bg:#d7efe7"
+style_root = "fg:#20323a bg:#e1c4cb"
+format = "[ $user ]($style)[](fg:#d7efe7 bg:#bfe6d9)"
+
+[time]
+disabled = false
+time_format = "%H:%M"
+style = "fg:#20323a bg:#bfe6d9"
+format = "[  $time ]($style)[](fg:#bfe6d9 bg:#a7dac9)"
+
 [custom.dir_git]
-command = 'basename "$PWD"'
-when = 'test "$PWD" != "$HOME" && git rev-parse --is-inside-work-tree >/dev/null 2>&1'
-style = "fg:white bg:blue"
-format = "[ $output ]($style)[](fg:blue bg:green)"
+command = 'printf " %s" "$(basename "$PWD")"'
+when = 'git rev-parse --is-inside-work-tree >/dev/null 2>&1'
+style = "fg:#20323a bg:#a7dac9"
+format = "[ $output ]($style)[](fg:#a7dac9 bg:#8fceb9)"
 
 [custom.dir_nogit]
-command = 'basename "$PWD"'
-when = 'test "$PWD" != "$HOME" && ! git rev-parse --is-inside-work-tree >/dev/null 2>&1'
-style = "fg:white bg:blue"
-format = "[ $output ]($style)[](fg:blue) "
+command = 'printf " %s" "$(basename "$PWD")"'
+when = '! git rev-parse --is-inside-work-tree >/dev/null 2>&1'
+style = "fg:#20323a bg:#a7dac9"
+format = "[ $output ]($style)[](fg:#a7dac9) "
 
 [git_branch]
-symbol = ""
-style = "fg:black bg:green"
-format = "[ $symbol $branch ]($style)[](fg:green) "
+symbol = ""
+style = "fg:#20323a bg:#8fceb9"
+format = "[ $symbol $branch ]($style)[](fg:#8fceb9) "
 
 [character]
-success_symbol = "[❯](bold green)"
-error_symbol = "[❯](bold red)"
+success_symbol = "[▸](bold #69bda7)"
+error_symbol = "[▸](bold #d49aa7)"
