@@ -23,3 +23,14 @@ map({ "i", "x", "n", "s" }, "<C-s>", "<cmd>w<cr><ESC>", { desc = "Save file" })
 
 -- 4. INSERTモードEsc以外の方法[jj]
 map("i", "jj", "<ESC>", { desc = "Escape to Normal Mode" })
+
+-- Explorer / editor focus
+map("n", "<leader>e", "<cmd>OilSidebarFocus<cr>", { desc = "Focus Explorer" })
+map("n", "<leader>m", "<cmd>OilMainFocus<cr>", { desc = "Focus Editor" })
+
+-- Buffer jump shortcuts like VS Code's tab selection.
+for i = 1, 9 do
+  map("n", "<leader>" .. i, "<cmd>BufferLineGoToBuffer " .. i .. "<cr>", {
+    desc = "Go to buffer " .. i,
+  })
+end
