@@ -44,7 +44,17 @@ table.insert(config.keys, {
 	mods = "LEADER",
 	action = wezterm.action.SplitHorizontal({ domain = "CurrentPaneDomain" }),
 })
--- ついでに水平分割 (Leader + h) も追加しておくと便利です
+table.insert(config.keys, {
+	key = "k",
+	mods = "LEADER",
+	action = wezterm.action.ActivatePaneDirection("Left"),
+})
+table.insert(config.keys, {
+	key = "s",
+	mods = "LEADER",
+	action = wezterm.action.ActivatePaneDirection("Right"),
+})
+-- 縦分割は元の Leader + h に戻す
 table.insert(config.keys, {
 	key = "h",
 	mods = "LEADER",
