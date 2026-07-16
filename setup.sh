@@ -167,6 +167,7 @@ if [ "$mode" = apply ]; then
   create_link "$repo_dir/karabiner" "$config_dir/karabiner"
   create_link "$repo_dir/starship/starship.toml" "$config_dir/starship.toml"
   echo "setup complete"
+  echo "note: restart Karabiner-Elements if karabiner settings are not reloaded"
 else
   remove_link "$repo_dir/nvim" "$config_dir/nvim"
   remove_link "$repo_dir/wezterm" "$config_dir/wezterm"

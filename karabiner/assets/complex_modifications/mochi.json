@@ -471,7 +471,8 @@
           },
           "to": [
             {
-              "key_code": "return_or_enter"
+              "key_code": "b",
+              "modifiers": ["control"]
             }
           ],
           "conditions": [

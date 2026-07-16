@@ -206,6 +206,23 @@
                                 "type": "basic"
                             },
                             {
+                                "conditions": [
+                                    {
+                                        "name": "space_layer",
+                                        "type": "variable_if",
+                                        "value": 1
+                                    }
+                                ],
+                                "from": { "key_code": "left_shift" },
+                                "to": [
+                                    {
+                                        "key_code": "b",
+                                        "modifiers": ["control"]
+                                    }
+                                ],
+                                "type": "basic"
+                            },
+                            {
                                 "from": { "key_code": "spacebar" },
                                 "to": [
                                     {
