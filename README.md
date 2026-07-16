@@ -1,7 +1,8 @@
 # dotfiles
 
-[ghq](https://github.com/x-motemen/ghq) と直接シンボリックリンクで管理する
-個人用の設定ファイルです。
+[Nix](https://nixos.org/) と
+[Home Manager](https://github.com/nix-community/home-manager) でCLIを、
+直接シンボリックリンクでアプリケーション設定を管理する個人用dotfilesです。
 
 ## 配置場所
 
@@ -9,13 +10,27 @@
 ~/ghq/github.com/HizumeKazushi/dotfiles
 ```
 
-## セットアップ
+## 初回セットアップ
+
+Nixをインストールした後、Nixpkgsのghqを一時的に実行してリポジトリを取得します。
 
 ```sh
-brew install ghq
-ghq get -p HizumeKazushi/dotfiles
+nix --extra-experimental-features 'nix-command flakes' \
+  run github:NixOS/nixpkgs/nixos-26.05#ghq -- \
+  get -p HizumeKazushi/dotfiles
 cd ~/ghq/github.com/HizumeKazushi/dotfiles
 ```
+
+Home Managerを初回適用します。この操作によって、以降のNixコマンドで
+`nix-command` と `flakes` が有効になります。
+
+```sh
+nix --extra-experimental-features 'nix-command flakes' \
+  run github:nix-community/home-manager/release-26.05 -- \
+  switch --flake .#apple
+```
+
+## 設定リンク
 
 リンクを作成する前に変更内容を確認します。
 
@@ -34,6 +49,35 @@ cd ~/ghq/github.com/HizumeKazushi/dotfiles
 ```sh
 ./setup.sh --remove
 ```
+
+## 日常の操作
+
+Home Manager設定を反映します。
+
+```sh
+home-manager switch --flake .#apple
+```
+
+依存を更新してから反映する場合は、lock fileを更新します。
+
+```sh
+nix flake update
+home-manager switch --flake .#apple
+```
+
+以前のHome Manager generationへ戻す場合は、一覧に表示される対象の
+`activate` を実行します。
+
+```sh
+home-manager generations
+/nix/store/<generation-path>/activate
+```
+
+## 管理範囲
+
+Home Managerでは、Git、GitHub CLI、ghq、fzf、lazygit、Starship、Zoxideを
+管理します。GUIアプリ、Homebrew cask、言語ランタイムは引き続きそれぞれの
+既存手段で管理します。
 
 ## 管理対象のリンク
 

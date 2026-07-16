@@ -1,0 +1,28 @@
+{ pkgs, ... }:
+
+{
+  home = {
+    username = "apple";
+    homeDirectory = "/Users/apple";
+    stateVersion = "26.05";
+
+    packages = with pkgs; [
+      git
+      gh
+      ghq
+      fzf
+      lazygit
+      starship
+      zoxide
+    ];
+  };
+
+  programs.home-manager.enable = true;
+
+  xdg = {
+    enable = true;
+    configFile."nix/nix.conf".text = ''
+      experimental-features = nix-command flakes
+    '';
+  };
+}
