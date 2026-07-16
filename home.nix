@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgsUnstable, ... }:
 
 {
   home = {
@@ -6,7 +6,7 @@
     homeDirectory = "/Users/apple";
     stateVersion = "26.05";
 
-    packages = with pkgs; [
+    packages = with pkgsUnstable; [
       git
       gh
       ghq
