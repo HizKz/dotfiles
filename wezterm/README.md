@@ -4,18 +4,39 @@
 
 `disable_default_key_bindings = true` になっているため、ここに書かれているものが実際の操作の基準になります。
 
-## Leader Key
+## Herdrとの役割分担
 
-- `Ctrl+b` : Leader キー
-- `Ctrl+b` → `v` : ペインを左右に分割
-- `Ctrl+b` → `h` : ペインを上下に分割
-- `Ctrl+b` → `m` : 背景透明度を切り替え
+ワークスペース、タブ、ペインはHerdrで管理します。WezTermにはLeader keyを
+設定せず、`Ctrl+b`をHerdrのprefix keyとしてそのまま渡します。
+WezTermの初期タブと新しいウィンドウではHerdrが自動的に起動します。
+`Ctrl+t`または`Cmd+t`で作成する外側のタブだけは、復旧や一時作業に使う
+ログインzshを起動します。
+
+詳しい使い分けとHerdrの操作方法は
+[`../herdr/README.md`](../herdr/README.md) を参照してください。
+
+Herdrでは`Ctrl+b`を押して離してから、操作キーを押します。
+
+| キー | 動作 |
+| --- | --- |
+| `Ctrl+b` → `?` | Herdrのキーバインド一覧 |
+| `Ctrl+b` → `c` | Herdrの新しいタブ |
+| `Ctrl+b` → `v` | Herdrのペインを右に分割 |
+| `Ctrl+b` → `-` | Herdrのペインを下に分割 |
+| `Ctrl+b` → `k/t/n/s` | Herdrのペインを左/下/上/右へ移動 |
+| `Ctrl+b` → `←/→` | Herdrの前/次のタブへ移動 |
+| `Ctrl+b` → `Shift+s` | Herdrの設定を開く |
+| `Ctrl+b` → `w` | Herdrのワークスペース一覧 |
+| `Ctrl+b` → `q` | Herdrからデタッチ |
+
+復旧手段として、以下に記載したWezTermのタブ・ペイン操作も残しています。
+通常の作業ではHerdr側の操作を使用します。
 
 ## タブ操作
 
 | キー | 動作 |
 | --- | --- |
-| `Ctrl+t` / `Cmd+t` | 新しいタブを開く |
+| `Ctrl+t` / `Cmd+t` | ログインzshを新しい外側のタブで開く |
 | `Ctrl+w` / `Cmd+w` | 現在のタブを閉じる |
 | `Ctrl+Tab` | 次のタブへ移動 |
 | `Ctrl+Shift+Tab` | 前のタブへ移動 |
@@ -56,6 +77,7 @@
 | キー | 動作 |
 | --- | --- |
 | `Alt+Enter` | フルスクリーン切り替え |
+| `Cmd+Shift+o` | 背景透明度を切り替え |
 | `Ctrl+=` / `Cmd+=` | フォントサイズを拡大 |
 | `Ctrl+-` / `Cmd+-` | フォントサイズを縮小 |
 | `Ctrl+0` / `Cmd+0` | フォントサイズをリセット |

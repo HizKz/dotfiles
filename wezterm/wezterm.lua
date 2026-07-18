@@ -34,32 +34,10 @@ config.font = wezterm.font_with_fallback({
 	"Symbols Nerd Font Mono",
 	"Apple Color Emoji",
 })
--- 2. リーダーキーの設定
-config.leader = { key = "b", mods = "CTRL", timeout_milliseconds = 1000 }
 
--- 3. 画面分割などの「追加分」を既存の keys リストに加える
--- (これで keybinds.lua の内容を消さずに済みます)
-table.insert(config.keys, {
-	key = "v",
-	mods = "LEADER",
-	action = wezterm.action.SplitHorizontal({ domain = "CurrentPaneDomain" }),
-})
-table.insert(config.keys, {
-	key = "k",
-	mods = "LEADER",
-	action = wezterm.action.ActivatePaneDirection("Left"),
-})
-table.insert(config.keys, {
-	key = "s",
-	mods = "LEADER",
-	action = wezterm.action.ActivatePaneDirection("Right"),
-})
--- 縦分割は元の Leader + h に戻す
-table.insert(config.keys, {
-	key = "h",
-	mods = "LEADER",
-	action = wezterm.action.SplitVertical({ domain = "CurrentPaneDomain" }),
-})
+-- Ctrl+b は Herdr の prefix key として端末へ渡す。
+-- WezTerm 側では Leader を設定せず、タブやペインは Herdr で管理する。
+config.default_prog = { wezterm.home_dir .. "/.nix-profile/bin/herdr" }
 
 -- 4. 基本設定
 config.disable_default_key_bindings = true
@@ -156,8 +134,8 @@ config.tab_bar_at_bottom = true
 config.tab_max_width = 34
 
 table.insert(config.keys, {
-	key = "m",
-	mods = "LEADER",
+	key = "o",
+	mods = "SHIFT|SUPER",
 	action = act.EmitEvent("toggle-mint-opacity"),
 })
 

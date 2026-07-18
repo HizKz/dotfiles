@@ -1,0 +1,23 @@
+onboarding = false
+
+[terminal]
+shell_mode = "auto"
+new_cwd = "follow"
+
+[keys]
+# k/t/n/s = left/down/up/right
+focus_pane_left = "prefix+k"
+focus_pane_down = "prefix+t"
+focus_pane_up = "prefix+n"
+focus_pane_right = "prefix+s"
+
+# prefix+n と prefix+s はペイン移動で使うため退避する。
+previous_tab = "prefix+left"
+next_tab = "prefix+right"
+settings = "prefix+shift+s"
+
+# Workspace navigationでも同じ配列を使う。
+navigate_pane_left = "k"
+navigate_pane_down = "t"
+navigate_pane_up = "n"
+navigate_pane_right = "s"

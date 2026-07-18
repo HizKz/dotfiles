@@ -3,6 +3,8 @@
 ## ファイルの役割
 
 - `karabiner.json`: Karabinerが実際に読み込む設定。通常の変更はここに入れる
+- `o24-layouts.json`: 新しいキーボードへ追加するo24配列の共通設定と差分
+- `add-o24-keyboard.sh`: 接続中のキーボードをo24プロファイルへ登録するスクリプト
 - `assets/complex_modifications/*.json`: Karabiner-Elementsへ追加するためのルール素材。
   ここだけを変更しても、現在のプロファイルには反映されない
 - `automatic_backups/*.json`: Karabiner-Elementsが作成したバックアップ
@@ -19,6 +21,40 @@
 readlink ~/.config/karabiner
 jq empty ~/.config/karabiner/karabiner.json
 ```
+
+## 新しいキーボードをo24へ追加する
+
+新しいキーボードを接続してから、次のコマンドを実行する。
+
+```sh
+./karabiner/add-o24-keyboard.sh
+```
+
+未登録の物理キーボードが一覧表示されるので、番号を選ぶ。既定では文字配列と
+`right_shift -> left_control`を含む`external`設定が追加される。
+同じvendor IDとproduct IDの機種が登録済みの場合は重複して追加しない。
+
+JIS外付けキーボードでは、無変換キーをDeleteにする設定を追加できる。
+
+```sh
+./karabiner/add-o24-keyboard.sh --variant jis
+```
+
+内蔵キーボードと同じCommand、Option、Deleteの入れ替えも使う場合は、
+`macbook-style`を指定する。
+
+```sh
+./karabiner/add-o24-keyboard.sh --variant macbook-style
+```
+
+設定を書き換えず、追加対象だけを確認する場合は`--dry-run`を付ける。
+
+```sh
+./karabiner/add-o24-keyboard.sh --dry-run
+```
+
+スクリプトは仮ファイルを検証してから`karabiner.json`を更新する。キーボード選択中に
+設定が変更された場合は、既存の変更を上書きせず終了する。
 
 ## 設定変更後の確認
 

@@ -110,8 +110,8 @@ return {
       vim.cmd("rightbelow vsplit")
       local new_win = vim.api.nvim_get_current_win()
       vim.api.nvim_win_set_buf(new_win, create_empty_buffer())
-      vim.wo[new_win].number = false
-      vim.wo[new_win].relativenumber = false
+      vim.wo[new_win].number = true
+      vim.wo[new_win].relativenumber = true
       vim.wo[new_win].signcolumn = "no"
       vim.wo[new_win].foldcolumn = "0"
       vim.wo[new_win].cursorline = false
@@ -345,8 +345,8 @@ return {
             vim.cmd("rightbelow vsplit")
             local new_win = vim.api.nvim_get_current_win()
             vim.api.nvim_win_set_buf(new_win, create_empty_buffer())
-            vim.wo[new_win].number = false
-            vim.wo[new_win].relativenumber = false
+            vim.wo[new_win].number = true
+            vim.wo[new_win].relativenumber = true
             vim.wo[new_win].signcolumn = "no"
             vim.wo[new_win].foldcolumn = "0"
             vim.w[sidebar_win].oil_main_win = new_win

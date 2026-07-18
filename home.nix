@@ -1,4 +1,4 @@
-{ pkgsUnstable, ... }:
+{ herdrPackage, pkgsUnstable, ... }:
 
 {
   home = {
@@ -14,6 +14,7 @@
       lazygit
       starship
       zoxide
+      herdrPackage
     ];
   };
 

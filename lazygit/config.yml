@@ -1,0 +1,102 @@
+# Lazygit keybindings for the Karabiner-Elements o24 layout.
+# Values are the keys received by Lazygit after Karabiner has remapped the
+# physical keys. See README.md for the physical-key reference.
+keybinding:
+  universal:
+    prevItem-alt: g
+    nextItem-alt: "."
+    prevPage: m
+    nextPage: j
+    scrollLeft: K
+    scrollRight: S
+    gotoTop: M
+    gotoBottom: J
+    prevBlock-alt: n
+    nextBlock-alt: i
+    nextMatch: <alt+g>
+    prevMatch: G
+    startSearch: b
+    optionMenu: B
+    goInto: [k, <enter>]
+    confirmMenu: [k, <enter>]
+    remove: a
+    new: <alt+g>
+    newWorktree: l
+    edit: u
+    openFile: y
+    scrollUpMain-alt1: N
+    scrollDownMain-alt1: T
+    executeShellCommand: H
+    createRebaseOptionsMenu: d
+    refresh: "<"
+    prevScreenMode: "?"
+    diffingMenu: L
+  status:
+    checkForUpdate: w
+    recentRepos: [k, <enter>]
+    allBranchesLogGraph: e
+    allBranchesLogGraphReverse: E
+  files:
+    commitChangesWithoutHook: l
+    amendLastCommit: E
+    ignoreFile: r
+    refreshFiles: ","
+    stashAllChanges: <alt+i>
+    viewStashOptions: I
+    toggleStagedAll: e
+    viewResetOptions: A
+    fetch: o
+    openMergeOptions: D
+    copyFileInfoToClipboard: f
+    collapseAll: "/"
+  branches:
+    createPullRequest: y
+    viewPullRequestOptions: Y
+    openPullRequestInBrowser: _
+    forceCheckoutBranch: O
+    checkoutPreviousBranch: "/"
+    rebaseBranch: ","
+    renameBranch: "<"
+    mergeIntoCurrentBranch: D
+    moveCommitsToNewBranch: G
+    viewGitFlowOptions: r
+    fastForward: o
+    createTag: ">"
+    setUpstream: w
+    fetchRemote: o
+    addForkRemote: O
+    sortOrder: <alt+i>
+  commits:
+    squashDown: <alt+i>
+    renameCommit: ","
+    renameCommitWithEditor: "<"
+    viewResetOptions: "-"
+    markCommitAsFixup: o
+    createFixupCommit: O
+    squashAboveCommits: I
+    amendToCommit: E
+    resetCommitAuthor: e
+    revertCommit: <alt+.>
+    markCommitAsBaseForRebase: ":"
+    tagCommit: ">"
+    copyCommitAttributeToClipboard: f
+    openInBrowser: y
+    openPullRequestInBrowser: _
+    viewBisectOptions: ";"
+    startInteractiveRebase: r
+  amendAttribute:
+    resetAuthor: e
+    setAuthor: E
+  stash:
+    popStash: "-"
+    renameStash: ","
+  main:
+    prevHunk: [<left>, n]
+    nextHunk: [<right>, i]
+    toggleSelectHunk: e
+    pickBothHunks: ";"
+    editSelectHunk: U
+  submodules:
+    init: r
+    update: w
+    bulkMenu: ";"

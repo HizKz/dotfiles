@@ -1,5 +1,8 @@
 local wezterm = require("wezterm")
 local act = wezterm.action
+local spawn_login_shell_tab = act.SpawnCommandInNewTab({
+	args = { "/bin/zsh", "-l" },
+})
 
 return {
 	keys = {
@@ -79,8 +82,8 @@ return {
 		{ key = "Q", mods = "SHIFT|CTRL", action = act.QuitApplication },
 		{ key = "R", mods = "CTRL", action = act.ReloadConfiguration },
 		{ key = "R", mods = "SHIFT|CTRL", action = act.ReloadConfiguration },
-		{ key = "T", mods = "CTRL", action = act.SpawnTab("CurrentPaneDomain") },
-		{ key = "T", mods = "SHIFT|CTRL", action = act.SpawnTab("CurrentPaneDomain") },
+		{ key = "T", mods = "CTRL", action = spawn_login_shell_tab },
+		{ key = "T", mods = "SHIFT|CTRL", action = spawn_login_shell_tab },
 		{
 			key = "U",
 			mods = "CTRL",
@@ -123,8 +126,8 @@ return {
 		{ key = "q", mods = "SUPER", action = act.QuitApplication },
 		{ key = "r", mods = "SHIFT|CTRL", action = act.ReloadConfiguration },
 		{ key = "r", mods = "SUPER", action = act.ReloadConfiguration },
-		{ key = "t", mods = "SHIFT|CTRL", action = act.SpawnTab("CurrentPaneDomain") },
-		{ key = "t", mods = "SUPER", action = act.SpawnTab("CurrentPaneDomain") },
+		{ key = "t", mods = "SHIFT|CTRL", action = spawn_login_shell_tab },
+		{ key = "t", mods = "SUPER", action = spawn_login_shell_tab },
 		{
 			key = "u",
 			mods = "SHIFT|CTRL",
