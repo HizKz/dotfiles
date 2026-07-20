@@ -1,7 +1,7 @@
 # dotfiles
 
 [Nix](https://nixos.org/) と
-[Home Manager](https://github.com/nix-community/home-manager) でCLIを、
+[Home Manager](https://github.com/nix-community/home-manager) でCLIとZsh設定を、
 直接シンボリックリンクでアプリケーション設定を管理する個人用dotfilesです。
 
 NixとHome Managerの日常的な使い方、更新、ロールバック、トラブル対応は
@@ -78,9 +78,13 @@ home-manager generations
 
 ## 管理範囲
 
-Home Managerでは、Git、GitHub CLI、ghq、fzf、Herdr、lazygit、Starship、
-Zoxideを管理します。GUIアプリ、Homebrew cask、言語ランタイムは引き続き
-それぞれの既存手段で管理します。
+Home Managerでは、Git、GitHub CLI、ghq、fzf、Herdr、lazygit、spotify-player、
+Starship、Zoxide、Zsh、Oh My Zshを管理します。GUIアプリ、Homebrew cask、
+言語ランタイムは引き続きそれぞれの既存手段で管理します。
+
+Zshの共通設定は[`shell.nix`](shell.nix)で管理します。端末や仕事環境に固有の
+設定は`~/.config/zsh/local.zsh`へ置きます。このファイルは存在する場合だけ
+読み込まれ、Gitでは管理しません。
 
 ## 管理対象のリンク
 
