@@ -4,6 +4,9 @@ onboarding = false
 shell_mode = "auto"
 new_cwd = "follow"
 
+[ui.sound]
+enabled = false
+
 [keys]
 # k/t/n/s = left/down/up/right
 focus_pane_left = "prefix+k"
