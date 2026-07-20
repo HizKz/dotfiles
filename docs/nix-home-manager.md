@@ -8,7 +8,7 @@ Neovimなどの設定ファイルはNixへ移しておらず、引き続き`setu
 
 | 対象 | 管理方法 |
 | --- | --- |
-| Git、gh、ghq、fzf、Herdr、lazygit、Starship、Zoxide | Home Manager |
+| Git、gh、ghq、fzf、Herdr、lazygit、spotify-player、Starship、Zoxide、Zsh、Oh My Zsh | Home Manager |
 | Neovim、WezTerm、Karabiner、Starship、Herdr、lazygitの設定 | `setup.sh`によるシンボリックリンク |
 | GUIアプリ、Homebrew cask | Homebrew |
 | Flutter、Node.js、Pythonなどの言語環境 | 既存のバージョン管理ツール |
@@ -23,6 +23,7 @@ lock済みのNixpkgs unstableから取得しています。これにより、構
 flake.nix   NixpkgsとHome Managerの入力、apple用構成の入口
 flake.lock  取得する依存リビジョンの固定
 home.nix    Home Managerで導入するCLIとユーザー設定
+shell.nix   Zsh、Oh My Zsh、Starship、Zoxide、fzfの設定
 setup.sh    ~/.config以下の設定リンクを作成・解除
 ```
 
@@ -51,10 +52,46 @@ home-manager generations
 次を実行します。
 
 ```sh
-command -v git gh ghq fzf herdr lazygit starship zoxide home-manager
+command -v git gh ghq fzf herdr lazygit spotify_player starship zoxide home-manager
 ```
 
 各パスが基本的に`/Users/apple/.nix-profile/bin/`から始まれば正常です。
+
+## Zsh設定
+
+共通のZsh設定はHome Managerが生成します。`~/.zshenv`から
+`~/.config/zsh`以下の設定を読み込み、Oh My Zsh、Starship、Zoxide、fzfの
+初期化もHome Managerが行います。Starshipの設定本体は従来どおり
+`setup.sh`が作成する`~/.config/starship.toml`のリンクを使用します。
+
+端末や仕事環境に固有のパス、エイリアスは次のファイルへ置きます。
+
+```text
+~/.config/zsh/local.zsh
+```
+
+このファイルは存在する場合だけ`.zshrc`の最後に読み込まれます。認証情報や
+仕事固有の値をリポジトリへ追加せず、ファイルの権限は`0600`にしてください。
+
+Zsh設定を変更した後は構成を評価、ビルドしてから反映します。
+
+```sh
+nix flake check
+nix build --no-link .#homeConfigurations.apple.activationPackage
+home-manager switch --flake .#apple
+```
+
+反映後は新しいログインシェルを開き、設定場所と主要な連携を確認します。
+
+```sh
+echo "$ZDOTDIR"
+command -v zsh starship zoxide fzf
+bindkey '^R'
+```
+
+以前の手動設定へ戻す場合は、Home Managerのgenerationを戻してから、移行時に
+`~/.local/state/dotfiles/zsh-backup`へ退避した`.zshrc`、`.zprofile`、
+`.zshenv`を復元します。
 
 ## CLIを追加・削除する
 
@@ -65,13 +102,16 @@ packages = with pkgsUnstable; [
   git
   gh
   ghq
-  fzf
   lazygit
-  starship
-  zoxide
+  pkgs.spotify-player
   herdrPackage
 ];
 ```
+
+spotify-playerはNixpkgs unstable 0.24.0のmacOSビルドがリンク時に失敗するため、
+当面は安定版Nixpkgsの0.23.0を明示的に使用します。
+
+Zsh、fzf、Starship、Zoxideは`shell.nix`の各`programs`モジュールで管理します。
 
 通常のパッケージ名はNixpkgs Searchで確認します。Herdrは公式flakeを
 `flake.nix`のinputへ追加し、`herdrPackage`として渡しています。一覧やinputを
@@ -129,6 +169,7 @@ ghq --version
 fzf --version
 herdr --version
 lazygit --version
+spotify_player --version
 starship --version
 zoxide --version
 ```
