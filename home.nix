@@ -1,6 +1,13 @@
-{ herdrPackage, pkgsUnstable, ... }:
+{
+  herdrPackage,
+  pkgs,
+  pkgsUnstable,
+  ...
+}:
 
 {
+  imports = [ ./shell.nix ];
+
   home = {
     username = "apple";
     homeDirectory = "/Users/apple";
@@ -10,10 +17,8 @@
       git
       gh
       ghq
-      fzf
       lazygit
-      starship
-      zoxide
+      pkgs.spotify-player
       herdrPackage
     ];
   };
