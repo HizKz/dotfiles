@@ -151,21 +151,18 @@ check_herdr_config_dir
 check_lazygit_config_dir
 
 if [ "$mode" != remove ]; then
-  check_source "$repo_dir/nvim"
   check_source "$repo_dir/wezterm"
   check_source "$repo_dir/karabiner"
   check_source "$repo_dir/starship/starship.toml"
   check_source "$repo_dir/herdr/config.toml"
   check_source "$repo_dir/lazygit/config.yml"
 
-  check_apply_target "$repo_dir/nvim" "$config_dir/nvim"
   check_apply_target "$repo_dir/wezterm" "$config_dir/wezterm"
   check_apply_target "$repo_dir/karabiner" "$config_dir/karabiner"
   check_apply_target "$repo_dir/starship/starship.toml" "$config_dir/starship.toml"
   check_apply_target "$repo_dir/herdr/config.toml" "$herdr_config_dir/config.toml"
   check_apply_target "$repo_dir/lazygit/config.yml" "$lazygit_config_dir/config.yml"
 else
-  check_remove_target "$repo_dir/nvim" "$config_dir/nvim"
   check_remove_target "$repo_dir/wezterm" "$config_dir/wezterm"
   check_remove_target "$repo_dir/karabiner" "$config_dir/karabiner"
   check_remove_target "$repo_dir/starship/starship.toml" "$config_dir/starship.toml"
@@ -194,7 +191,6 @@ if [ "$mode" = apply ]; then
     mkdir -p "$lazygit_config_dir"
   fi
 
-  create_link "$repo_dir/nvim" "$config_dir/nvim"
   create_link "$repo_dir/wezterm" "$config_dir/wezterm"
   create_link "$repo_dir/karabiner" "$config_dir/karabiner"
   create_link "$repo_dir/starship/starship.toml" "$config_dir/starship.toml"
@@ -203,7 +199,6 @@ if [ "$mode" = apply ]; then
   echo "setup complete"
   echo "note: restart Karabiner-Elements if karabiner settings are not reloaded"
 else
-  remove_link "$repo_dir/nvim" "$config_dir/nvim"
   remove_link "$repo_dir/wezterm" "$config_dir/wezterm"
   remove_link "$repo_dir/karabiner" "$config_dir/karabiner"
   remove_link "$repo_dir/starship/starship.toml" "$config_dir/starship.toml"
