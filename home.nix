@@ -1,10 +1,31 @@
 {
   herdrPackage,
-  pkgs,
+  nixvimPackage,
   pkgsUnstable,
   ...
 }:
 
+let
+  spotifyPlayer =
+    (pkgsUnstable.spotify-player.override {
+      # The full Darwin feature set makes cctools ld abort while linking 0.24.0.
+      # Keep the TUI, OAuth, Spotify Connect, cover image, and CoreAudio streaming features.
+      withDaemon = false;
+      withFuzzy = false;
+      withImage = true;
+      withMediaControl = false;
+      withNotify = false;
+      withSixel = false;
+    }).overrideAttrs
+      (old: {
+        patches =
+          (old.patches or [ ])
+          ++ [
+            ./patches/spotify-player-preserve-web-api-token.patch
+            ./patches/spotify-player-force-kitty-in-herdr.patch
+          ];
+      });
+in
 {
   imports = [ ./shell.nix ];
 
@@ -18,7 +39,8 @@
       gh
       ghq
       lazygit
-      pkgs.spotify-player
+      nixvimPackage
+      spotifyPlayer
       herdrPackage
     ];
   };
