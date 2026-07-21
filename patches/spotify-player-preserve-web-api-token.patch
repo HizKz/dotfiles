@@ -1,0 +1,13 @@
+diff --git a/spotify_player/src/client/mod.rs b/spotify_player/src/client/mod.rs
+index 2aab9f4..fb4ba7a 100644
+--- a/spotify_player/src/client/mod.rs
++++ b/spotify_player/src/client/mod.rs
+@@ -249,7 +249,3 @@ impl AppClient {
+         tracing::info!("Used a new session for Spotify client.");
+-
+-        if let Err(err) = self.refresh_token().await {
+-            tracing::warn!("Failed to refresh auth token after creating a new session: {err:#}");
+-        }
+-
++
+         if let Some(state) = state {
