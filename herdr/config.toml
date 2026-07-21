@@ -7,6 +7,9 @@ new_cwd = "follow"
 [ui.sound]
 enabled = false
 
+[experimental]
+kitty_graphics = true
+
 [keys]
 # k/t/n/s = left/down/up/right
 focus_pane_left = "prefix+k"
