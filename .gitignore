@@ -2,6 +2,7 @@
 **/.DS_Store
 .nvimlog
 **/.nvimlog
+nvim.log
 automatic_backups/
 **/automatic_backups/
 
