@@ -1,3 +1,5 @@
+{ pkgs, ... }:
+
 {
   plugins = {
     lsp = {
@@ -102,4 +104,18 @@
       };
     };
   };
+
+  extraPlugins = with pkgs.vimPlugins; [
+    go-nvim
+    guihua-lua
+  ];
+
+  extraConfigLuaPost = ''
+    require("go").setup({
+      lsp_cfg = false,
+      lsp_gofumpt = true,
+      trouble = true,
+      test_runner = "go",
+    })
+  '';
 }

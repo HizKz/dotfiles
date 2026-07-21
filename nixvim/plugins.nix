@@ -114,72 +114,6 @@
       };
     };
 
-    snacks = {
-      enable = true;
-      settings = {
-        bigfile.enabled = true;
-        dashboard = {
-          enabled = true;
-          width = 80;
-          preset.header = "";
-          sections = [
-            { __raw = "function() return require('config.dashboard_art').section() end"; }
-            {
-              section = "recent_files";
-              title = "Recent Files";
-              padding = 1;
-              indent = 2;
-              limit = 8;
-            }
-            {
-              section = "projects";
-              title = "Recent Projects";
-              padding = 1;
-              indent = 2;
-              limit = 5;
-            }
-            {
-              __raw = ''
-                function()
-                  local version = vim.version()
-                  return {
-                    align = "center",
-                    text = {
-                      {
-                        ("⚡ Neovim %d.%d.%d via Nixvim"):format(
-                          version.major,
-                          version.minor,
-                          version.patch
-                        ),
-                        hl = "footer",
-                      },
-                    },
-                  }
-                end
-              '';
-            }
-          ];
-        };
-        notifier = {
-          enabled = true;
-          timeout = 3000;
-        };
-        quickfile.enabled = true;
-      };
-    };
-
-    oil = {
-      enable = true;
-      callSetup = false;
-    };
-    bufferline = {
-      enable = true;
-      callSetup = false;
-    };
-    lualine = {
-      enable = true;
-      callSetup = false;
-    };
   };
 
   diagnostic.settings = {
@@ -191,4 +125,9 @@
       source = "if_many";
     };
   };
+
+  extraFiles."lua/config/markdown.lua".source = ./lua/markdown.lua;
+  extraConfigLuaPost = ''
+    require("config.markdown")
+  '';
 }

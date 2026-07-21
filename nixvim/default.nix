@@ -4,8 +4,9 @@
   imports = [
     ./base.nix
     ./languages.nix
+    ./oil.nix
     ./plugins.nix
-    ./legacy.nix
+    ./ui.nix
   ];
 
   wrapRc = true;

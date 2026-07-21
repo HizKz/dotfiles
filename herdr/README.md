@@ -127,8 +127,9 @@ herdr server reload-config
 Kitty graphics描画を有効にしています。`spotify_player`はHerdr上のWezTermを
 検出するとKitty graphicsを明示的に選択します。設定変更後はHerdrクライアントと
 対象TUIを起動し直します。カバー画像の縦横比は、spotify-player側で
-`cover_img_length = 0`とし、Herdrが報告する`16x33`pxの端末セル比率から
-自動計算します。
+`cover_img_length = 0`として端末セル比率から自動計算します。正方形の画像を
+正確に表示する場合は、`Ctrl+t`または`Cmd+t`で素のWezTermタブを開き、Herdrを
+介さず`spotify_player`を起動します。
 
 Codexのセッション識別情報をHerdrへ連携し、サーバー再起動後の会話復元を
 利用する場合はintegrationをインストールします。
