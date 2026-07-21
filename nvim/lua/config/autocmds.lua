@@ -30,6 +30,12 @@ vim.api.nvim_create_autocmd("VimEnter", {
   group = oil_sidebar,
   callback = function()
     vim.schedule(function()
+      -- Keep the startup dashboard full-width. Oil is still available on
+      -- demand via <leader>e, and opens automatically for explicit paths.
+      if vim.fn.argc() == 0 or vim.bo.filetype == "snacks_dashboard" then
+        return
+      end
+
       local started_in_oil = vim.bo.filetype == "oil"
 
       if started_in_oil and vim.fn.exists(":OilSidebarOpen") == 2 then
@@ -44,5 +50,17 @@ vim.api.nvim_create_autocmd("VimEnter", {
         end)
       end
     end)
+  end,
+})
+
+vim.api.nvim_create_autocmd("User", {
+  group = oil_sidebar,
+  pattern = "SnacksDashboardOpened",
+  callback = function()
+    for _, win in ipairs(vim.api.nvim_list_wins()) do
+      if vim.api.nvim_win_is_valid(win) and vim.w[win].oil_sidebar == true then
+        vim.api.nvim_win_close(win, true)
+      end
+    end
   end,
 })

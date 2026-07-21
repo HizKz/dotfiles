@@ -143,33 +143,49 @@ return {
       local current_win = vim.api.nvim_get_current_win()
       local reuse_current = opts_.reuse_current == true and vim.bo[vim.api.nvim_win_get_buf(current_win)].filetype == "oil"
 
+      local function finish_open()
+        if not sidebar_win or not vim.api.nvim_win_is_valid(sidebar_win) then
+          return
+        end
+
+        resize_sidebar(sidebar_win)
+        vim.wo[sidebar_win].winfixwidth = true
+
+        ensure_main_window()
+
+        local main_win = find_main_window(vim.w[sidebar_win].oil_main_win)
+        if opts_.focus_sidebar then
+          vim.api.nvim_set_current_win(sidebar_win)
+        elseif reuse_current and main_win then
+          vim.w[sidebar_win].oil_main_win = main_win
+          vim.api.nvim_set_current_win(main_win)
+        elseif vim.api.nvim_win_is_valid(current_win) then
+          vim.api.nvim_set_current_win(current_win)
+        elseif main_win then
+          vim.api.nvim_set_current_win(main_win)
+        end
+      end
+
       if not reuse_current then
         vim.cmd("topleft vsplit")
-        oil.open()
         sidebar_win = vim.api.nvim_get_current_win()
+        vim.w[sidebar_win].oil_sidebar = true
+        vim.w[sidebar_win].oil_main_win = current_win
+
+        -- Oil renders asynchronously. Keep the Oil window focused until its
+        -- adapter and view are ready, then restore the editor focus.
+        oil.open(vim.fn.getcwd(), nil, function()
+          -- Oil invokes its ready callback through nvim_buf_call(). Defer the
+          -- window change so nvim_buf_call() cannot restore the Oil window
+          -- over our editor focus afterwards.
+          vim.schedule(finish_open)
+        end)
       else
         sidebar_win = current_win
         vim.cmd("topleft wincmd H")
-      end
-
-      resize_sidebar(sidebar_win)
-
-      vim.wo[sidebar_win].winfixwidth = true
-      vim.w[sidebar_win].oil_sidebar = true
-      vim.w[sidebar_win].oil_main_win = current_win
-
-      ensure_main_window()
-
-      local main_win = find_main_window(vim.w[sidebar_win].oil_main_win)
-      if reuse_current and main_win then
-        vim.w[sidebar_win].oil_main_win = main_win
-        vim.api.nvim_set_current_win(main_win)
-      elseif vim.api.nvim_win_is_valid(current_win) then
-        vim.api.nvim_set_current_win(current_win)
-      else
-        if main_win then
-          vim.api.nvim_set_current_win(main_win)
-        end
+        vim.w[sidebar_win].oil_sidebar = true
+        vim.w[sidebar_win].oil_main_win = current_win
+        finish_open()
       end
 
       return sidebar_win
@@ -186,8 +202,7 @@ return {
     vim.api.nvim_create_user_command("OilSidebarFocus", function()
       local sidebar_win = get_sidebar_window()
       if not sidebar_win then
-        vim.cmd("OilSidebar")
-        sidebar_win = get_sidebar_window()
+        sidebar_win = open_sidebar({ toggle = false, focus_sidebar = true })
       end
 
       if sidebar_win and vim.api.nvim_win_is_valid(sidebar_win) then

@@ -138,7 +138,26 @@
               indent = 2;
               limit = 5;
             }
-            { section = "startup"; }
+            {
+              __raw = ''
+                function()
+                  local version = vim.version()
+                  return {
+                    align = "center",
+                    text = {
+                      {
+                        ("⚡ Neovim %d.%d.%d via Nixvim"):format(
+                          version.major,
+                          version.minor,
+                          version.patch
+                        ),
+                        hl = "footer",
+                      },
+                    },
+                  }
+                end
+              '';
+            }
           ];
         };
         notifier = {
