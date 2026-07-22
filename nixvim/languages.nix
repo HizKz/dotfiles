@@ -1,5 +1,26 @@
 { pkgs, ... }:
 
+let
+  mapKey = mode: key: action: desc: {
+    inherit mode key action;
+    options = {
+      inherit desc;
+      silent = true;
+      remap = false;
+    };
+  };
+  diagnosticJump = count: severity: {
+    __raw = ''
+      function()
+        vim.diagnostic.jump({
+          count = ${toString count} * vim.v.count1,
+          severity = ${severity},
+          float = true,
+        })
+      end
+    '';
+  };
+in
 {
   plugins = {
     lsp = {
@@ -108,6 +129,24 @@
   extraPlugins = with pkgs.vimPlugins; [
     go-nvim
     guihua-lua
+  ];
+
+  keymaps = [
+    (mapKey "n" "gD" { __raw = "vim.lsp.buf.declaration"; } "Go to Declaration")
+    (mapKey "n" "gK" { __raw = "vim.lsp.buf.signature_help"; } "Signature Help")
+    (mapKey "i" "<C-k>" { __raw = "vim.lsp.buf.signature_help"; } "Signature Help")
+    (mapKey "x" "<leader>ca" { __raw = "vim.lsp.buf.code_action"; } "Code Action")
+    (mapKey [ "n" "x" ] "<leader>cf" { __raw = "function() require('conform').format({ async = true, lsp_format = 'fallback' }) end"; } "Format")
+    (mapKey "n" "<leader>cl" "<cmd>LspInfo<cr>" "LSP Info")
+    (mapKey [ "n" "x" ] "<leader>cc" { __raw = "vim.lsp.codelens.run"; } "Run Codelens")
+    (mapKey "n" "<leader>cC" { __raw = "vim.lsp.codelens.refresh"; } "Refresh Codelens")
+    (mapKey "n" "<leader>cd" { __raw = "vim.diagnostic.open_float"; } "Line Diagnostics")
+    (mapKey "n" "]d" (diagnosticJump 1 "nil") "Next Diagnostic")
+    (mapKey "n" "[d" (diagnosticJump (-1) "nil") "Previous Diagnostic")
+    (mapKey "n" "]e" (diagnosticJump 1 "vim.diagnostic.severity.ERROR") "Next Error")
+    (mapKey "n" "[e" (diagnosticJump (-1) "vim.diagnostic.severity.ERROR") "Previous Error")
+    (mapKey "n" "]w" (diagnosticJump 1 "vim.diagnostic.severity.WARN") "Next Warning")
+    (mapKey "n" "[w" (diagnosticJump (-1) "vim.diagnostic.severity.WARN") "Previous Warning")
   ];
 
   extraConfigLuaPost = ''

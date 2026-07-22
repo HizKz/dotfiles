@@ -3,6 +3,7 @@
 {
   imports = [
     ./base.nix
+    ./keymaps.nix
     ./languages.nix
     ./oil.nix
     ./plugins.nix

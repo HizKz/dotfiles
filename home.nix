@@ -24,6 +24,12 @@ let
             ./patches/spotify-player-preserve-web-api-token.patch
             ./patches/spotify-player-force-kitty-in-herdr.patch
           ];
+        postPatch =
+          (old.postPatch or "")
+          + ''
+            patch -d "$cargoDepsCopy/source-registry-0/rspotify-0.15.3" -p1 \
+              < ${./patches/rspotify-preserve-refresh-token.patch}
+          '';
       });
 in
 {

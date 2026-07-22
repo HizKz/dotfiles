@@ -29,6 +29,7 @@
     }:
     let
       system = "aarch64-darwin";
+      pkgsStable = nixpkgs.legacyPackages.${system};
       pkgsUnstable = nixpkgs-unstable.legacyPackages.${system};
       nixvimConfiguration = nixvim.lib.evalNixvim {
         inherit system;
@@ -59,10 +60,21 @@
     in
     {
       packages.${system}.nixvim = nixvimPackage;
-      checks.${system}.nixvim = nixvimConfiguration.config.build.test;
+      checks.${system} = {
+        nixvim = nixvimConfiguration.config.build.test;
+        nixvim-keymaps = pkgsStable.runCommand "nixvim-keymaps-check" { } ''
+          export XDG_CACHE_HOME="$TMPDIR/cache"
+          export XDG_DATA_HOME="$TMPDIR/data"
+          export XDG_STATE_HOME="$TMPDIR/state"
+          mkdir -p "$XDG_CACHE_HOME" "$XDG_DATA_HOME" "$XDG_STATE_HOME"
+          ${nixvimPackage}/bin/nvim --headless -i NONE \
+            -c "luafile ${./nixvim/tests/keymaps.lua}"
+          touch "$out"
+        '';
+      };
 
       homeConfigurations.apple = home-manager.lib.homeManagerConfiguration {
-        pkgs = nixpkgs.legacyPackages.${system};
+        pkgs = pkgsStable;
         extraSpecialArgs = {
           herdrPackage = herdr.packages.aarch64-darwin.default;
           inherit nixvimPackage pkgsUnstable;
