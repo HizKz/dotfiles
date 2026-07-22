@@ -1,0 +1,26 @@
+diff --git a/src/auth_code_pkce.rs b/src/auth_code_pkce.rs
+index 57bec0e..793f0d2 100644
+--- a/src/auth_code_pkce.rs
++++ b/src/auth_code_pkce.rs
+@@ -69,12 +69,19 @@ impl BaseClient for AuthCodePkceSpotify {
+                 refresh_token: Some(refresh_token),
+                 ..
+             }) => {
++                let refresh_token = refresh_token.clone();
+                 let mut data = Form::new();
+                 data.insert(params::GRANT_TYPE, params::GRANT_TYPE_REFRESH_TOKEN);
+-                data.insert(params::REFRESH_TOKEN, refresh_token);
++                data.insert(params::REFRESH_TOKEN, &refresh_token);
+                 data.insert(params::CLIENT_ID, &self.creds.id);
+ 
+-                let token = self.fetch_access_token(&data, None).await?;
++                let mut token = self.fetch_access_token(&data, None).await?;
++
++                // Spotify does not always rotate the refresh token. In that case the
++                // existing token remains valid and must be retained for the next refresh.
++                if token.refresh_token.is_none() {
++                    token.refresh_token = Some(refresh_token);
++                }
+ 
+                 if let Some(callback_fn) = &*self.get_config().token_callback_fn.clone() {
+                     callback_fn.0(token.clone())?;
