@@ -51,6 +51,9 @@ Karabiner-Elementsの`o24`プロファイルを前提に、Karabiner変換後の
 基準に設定している。QWERTYの物理位置ではなく、o24で入力される文字を
 `config.toml`へ記述する。
 
+キーバインドを変更する前に
+[`../docs/o24-keybindings.md`](../docs/o24-keybindings.md)を必ず確認する。
+
 ### 一覧と本文の操作
 
 | o24入力 | 操作 |
