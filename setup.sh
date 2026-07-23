@@ -49,7 +49,8 @@ fi
 repo_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd -P)
 config_dir=$HOME/.config
 herdr_config_dir=$config_dir/herdr
-lazygit_config_dir="$HOME/Library/Application Support/lazygit"
+lazygit_config_dir=$config_dir/lazygit
+legacy_lazygit_config_file="$HOME/Library/Application Support/lazygit/config.yml"
 codex_history_config_dir="$HOME/Library/Application Support/codex-history"
 errors=0
 
@@ -137,6 +138,15 @@ check_remove_target() {
   fi
 }
 
+check_legacy_lazygit_target() {
+  source_path=$1
+
+  if [ -L "$legacy_lazygit_config_file" ] &&
+    [ "$(readlink "$legacy_lazygit_config_file")" = "$source_path" ]; then
+    echo "remove obsolete: $legacy_lazygit_config_file"
+  fi
+}
+
 create_link() {
   source_path=$1
   target_path=$2
@@ -173,6 +183,7 @@ if [ "$mode" != remove ]; then
   check_apply_target "$repo_dir/starship/starship.toml" "$config_dir/starship.toml"
   check_apply_target "$repo_dir/herdr/config.toml" "$herdr_config_dir/config.toml"
   check_apply_target "$repo_dir/lazygit/config.yml" "$lazygit_config_dir/config.yml"
+  check_legacy_lazygit_target "$repo_dir/lazygit/config.yml"
   check_apply_target "$repo_dir/codex-history/config.toml" "$codex_history_config_dir/config.toml"
 else
   check_remove_target "$repo_dir/wezterm" "$config_dir/wezterm"
@@ -180,6 +191,7 @@ else
   check_remove_target "$repo_dir/starship/starship.toml" "$config_dir/starship.toml"
   check_remove_target "$repo_dir/herdr/config.toml" "$herdr_config_dir/config.toml"
   check_remove_target "$repo_dir/lazygit/config.yml" "$lazygit_config_dir/config.yml"
+  check_legacy_lazygit_target "$repo_dir/lazygit/config.yml"
   check_remove_target "$repo_dir/codex-history/config.toml" "$codex_history_config_dir/config.toml"
 fi
 
@@ -211,6 +223,7 @@ if [ "$mode" = apply ]; then
   create_link "$repo_dir/karabiner" "$config_dir/karabiner"
   create_link "$repo_dir/starship/starship.toml" "$config_dir/starship.toml"
   create_link "$repo_dir/herdr/config.toml" "$herdr_config_dir/config.toml"
+  remove_link "$repo_dir/lazygit/config.yml" "$legacy_lazygit_config_file"
   create_link "$repo_dir/lazygit/config.yml" "$lazygit_config_dir/config.yml"
   create_link "$repo_dir/codex-history/config.toml" "$codex_history_config_dir/config.toml"
   echo "setup complete"
@@ -220,6 +233,7 @@ else
   remove_link "$repo_dir/karabiner" "$config_dir/karabiner"
   remove_link "$repo_dir/starship/starship.toml" "$config_dir/starship.toml"
   remove_link "$repo_dir/herdr/config.toml" "$herdr_config_dir/config.toml"
+  remove_link "$repo_dir/lazygit/config.yml" "$legacy_lazygit_config_file"
   remove_link "$repo_dir/lazygit/config.yml" "$lazygit_config_dir/config.yml"
   remove_link "$repo_dir/codex-history/config.toml" "$codex_history_config_dir/config.toml"
   echo "removal complete"
