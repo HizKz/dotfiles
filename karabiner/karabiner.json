@@ -779,6 +779,14 @@
                             "to": [{ "key_code": "s" }]
                         },
                         {
+                            "from": { "key_code": "left_command" },
+                            "to": [{ "key_code": "delete_or_backspace" }]
+                        },
+                        {
+                            "from": { "key_code": "left_option" },
+                            "to": [{ "key_code": "left_command" }]
+                        },
+                        {
                             "from": { "key_code": "m" },
                             "to": [{ "key_code": "d" }]
                         },
@@ -829,14 +837,6 @@
                         {
                             "from": { "key_code": "y" },
                             "to": [{ "key_code": "f" }]
-                        },
-                        {
-                            "from": { "key_code": "left_command" },
-                            "to": [{ "key_code": "delete_or_backspace" }]
-                        },
-                        {
-                            "from": { "key_code": "left_option" },
-                            "to": [{ "key_code": "left_command" }]
                         }
                     ]
                 }
