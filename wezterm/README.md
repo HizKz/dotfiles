@@ -4,6 +4,9 @@
 
 `disable_default_key_bindings = true` になっているため、ここに書かれているものが実際の操作の基準になります。
 
+キーバインドを変更する前に
+[`../docs/o24-keybindings.md`](../docs/o24-keybindings.md)を必ず確認してください。
+
 ## Herdrとの役割分担
 
 ワークスペース、タブ、ペインはHerdrで管理します。WezTermにはLeader keyを

@@ -41,6 +41,9 @@ nix flake check
 `<leader>`はSpaceです。`<leader>?`で現在のバッファから利用できるキーマップを
 確認できます。
 
+キーマップを変更する前に
+[`../docs/o24-keybindings.md`](../docs/o24-keybindings.md)を必ず確認してください。
+
 ### 基本操作
 
 - `k/t/n/s`: 左/下/上/右へ移動
