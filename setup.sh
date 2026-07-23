@@ -50,6 +50,7 @@ repo_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd -P)
 config_dir=$HOME/.config
 herdr_config_dir=$config_dir/herdr
 lazygit_config_dir="$HOME/Library/Application Support/lazygit"
+codex_history_config_dir="$HOME/Library/Application Support/codex-history"
 errors=0
 
 report_conflict() {
@@ -80,6 +81,14 @@ check_lazygit_config_dir() {
     report_conflict "$lazygit_config_dir" "symlink instead of a managed directory"
   elif [ -e "$lazygit_config_dir" ] && [ ! -d "$lazygit_config_dir" ]; then
     report_conflict "$lazygit_config_dir" "not a directory"
+  fi
+}
+
+check_codex_history_config_dir() {
+  if [ -L "$codex_history_config_dir" ]; then
+    report_conflict "$codex_history_config_dir" "symlink instead of a managed directory"
+  elif [ -e "$codex_history_config_dir" ] && [ ! -d "$codex_history_config_dir" ]; then
+    report_conflict "$codex_history_config_dir" "not a directory"
   fi
 }
 
@@ -149,6 +158,7 @@ remove_link() {
 check_config_dir
 check_herdr_config_dir
 check_lazygit_config_dir
+check_codex_history_config_dir
 
 if [ "$mode" != remove ]; then
   check_source "$repo_dir/wezterm"
@@ -156,18 +166,21 @@ if [ "$mode" != remove ]; then
   check_source "$repo_dir/starship/starship.toml"
   check_source "$repo_dir/herdr/config.toml"
   check_source "$repo_dir/lazygit/config.yml"
+  check_source "$repo_dir/codex-history/config.toml"
 
   check_apply_target "$repo_dir/wezterm" "$config_dir/wezterm"
   check_apply_target "$repo_dir/karabiner" "$config_dir/karabiner"
   check_apply_target "$repo_dir/starship/starship.toml" "$config_dir/starship.toml"
   check_apply_target "$repo_dir/herdr/config.toml" "$herdr_config_dir/config.toml"
   check_apply_target "$repo_dir/lazygit/config.yml" "$lazygit_config_dir/config.yml"
+  check_apply_target "$repo_dir/codex-history/config.toml" "$codex_history_config_dir/config.toml"
 else
   check_remove_target "$repo_dir/wezterm" "$config_dir/wezterm"
   check_remove_target "$repo_dir/karabiner" "$config_dir/karabiner"
   check_remove_target "$repo_dir/starship/starship.toml" "$config_dir/starship.toml"
   check_remove_target "$repo_dir/herdr/config.toml" "$herdr_config_dir/config.toml"
   check_remove_target "$repo_dir/lazygit/config.yml" "$lazygit_config_dir/config.yml"
+  check_remove_target "$repo_dir/codex-history/config.toml" "$codex_history_config_dir/config.toml"
 fi
 
 if [ "$errors" -ne 0 ]; then
@@ -190,12 +203,16 @@ if [ "$mode" = apply ]; then
   if [ ! -d "$lazygit_config_dir" ]; then
     mkdir -p "$lazygit_config_dir"
   fi
+  if [ ! -d "$codex_history_config_dir" ]; then
+    mkdir -p "$codex_history_config_dir"
+  fi
 
   create_link "$repo_dir/wezterm" "$config_dir/wezterm"
   create_link "$repo_dir/karabiner" "$config_dir/karabiner"
   create_link "$repo_dir/starship/starship.toml" "$config_dir/starship.toml"
   create_link "$repo_dir/herdr/config.toml" "$herdr_config_dir/config.toml"
   create_link "$repo_dir/lazygit/config.yml" "$lazygit_config_dir/config.yml"
+  create_link "$repo_dir/codex-history/config.toml" "$codex_history_config_dir/config.toml"
   echo "setup complete"
   echo "note: restart Karabiner-Elements if karabiner settings are not reloaded"
 else
@@ -204,5 +221,6 @@ else
   remove_link "$repo_dir/starship/starship.toml" "$config_dir/starship.toml"
   remove_link "$repo_dir/herdr/config.toml" "$herdr_config_dir/config.toml"
   remove_link "$repo_dir/lazygit/config.yml" "$lazygit_config_dir/config.yml"
+  remove_link "$repo_dir/codex-history/config.toml" "$codex_history_config_dir/config.toml"
   echo "removal complete"
 fi
