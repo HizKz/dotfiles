@@ -15,7 +15,10 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    nixvim.url = "github:nix-community/nixvim/nixos-26.05";
+    nixvim = {
+      url = "github:nix-community/nixvim/nixos-26.05";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -36,6 +39,7 @@
         modules = [
           ./nixvim
           {
+            nixpkgs.source = nixpkgs.outPath;
             extraPackages = with pkgsUnstable; [
               delve
               fd

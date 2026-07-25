@@ -58,6 +58,8 @@ command -v git gh ghq fzf herdr lazygit nvim spotify_player starship zoxide home
 ```
 
 各パスが基本的に`/Users/apple/.nix-profile/bin/`から始まれば正常です。
+ログインシェルではHomebrewとpyenvの初期化後にNix profileをPATHの先頭へ戻すため、
+すでにHome Managerの環境変数を継承しているタブやシェルでもNix版を優先します。
 
 ## Zsh設定
 
@@ -74,6 +76,7 @@ command -v git gh ghq fzf herdr lazygit nvim spotify_player starship zoxide home
 
 このファイルは存在する場合だけ`.zshrc`の最後に読み込まれます。認証情報や
 仕事固有の値をリポジトリへ追加せず、ファイルの権限は`0600`にしてください。
+`local.zsh`でPATHを変更した場合は、その明示的な設定が共通設定より後に適用されます。
 
 Zsh設定を変更した後は構成を評価、ビルドしてから反映します。
 

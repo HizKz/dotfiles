@@ -73,6 +73,9 @@ in
         if command -v pyenv >/dev/null 2>&1; then
           eval "$(pyenv init --path)"
         fi
+
+        typeset -U path
+        path=("${config.home.profileDirectory}/bin" $path)
       '';
 
       initContent = lib.mkMerge [
