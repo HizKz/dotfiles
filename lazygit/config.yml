@@ -12,7 +12,7 @@ keybinding:
 
     # These defaults conflict with the o24 navigation keys above.
     nextMatch: <alt+n>
-    new: <alt+n>
+    new: <ctrl+n>
 
   status:
     recentRepos: [h, <enter>]

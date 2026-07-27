@@ -55,12 +55,14 @@ Lazygitが受け取るのは、Karabinerによる変換後の文字です。QWER
 | `?` | キーバインドメニュー |
 | `q` | 終了 |
 
-`n`、`t`、`s`を移動へ使うため、重なる操作はRight Optionとの組み合わせへ
-移しています。左OptionはKarabinerでCommandへ変換されるため使用しません。
+`n`、`t`、`s`を移動へ使うため、重なる操作はControlまたはRight Optionとの
+組み合わせへ移しています。左OptionはKarabinerでCommandへ変換されるため
+使用しません。
 
 | o24入力 | Lazygit入力 | 操作 |
 | --- | --- | --- |
-| `Right Option+n` | `<alt+n>` | new、検索中の次の一致 |
+| `Ctrl+n` | `<ctrl+n>` | new（ブランチ画面ではブランチ作成） |
+| `Right Option+n` | `<alt+n>` | 検索中の次の一致 |
 | `Right Option+t` | `<alt+t>` | commitのrevert |
 | `Right Option+s` | `<alt+s>` | stash、squash、sort order |
 
