@@ -42,7 +42,7 @@ max_parallel_reads = 4
 
 [resume]
 # return, replace, or print_command
-mode = "return"
+mode = "replace"
 
 [keys]
 # Set false to build a keymap from scratch. ctrl+c is always reserved.
