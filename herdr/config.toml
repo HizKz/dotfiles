@@ -21,7 +21,12 @@ focus_pane_right = "prefix+s"
 # prefix+n と prefix+s はペイン移動で使うため退避する。
 previous_tab = "prefix+left"
 next_tab = "prefix+right"
+previous_workspace = "prefix+up"
+next_workspace = "prefix+down"
 settings = "prefix+shift+s"
+
+# prefix+1..9 はTab切り替え、Shift付きはAgent切り替えに使う。
+focus_agent = "prefix+shift+1..9"
 
 # Workspace navigationでも同じ配列を使う。
 navigate_pane_left = "k"

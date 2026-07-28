@@ -28,6 +28,8 @@ Herdrでは`Ctrl+b`を押して離してから、操作キーを押します。
 | `Ctrl+b` → `-` | Herdrのペインを下に分割 |
 | `Ctrl+b` → `k/t/n/s` | Herdrのペインを左/下/上/右へ移動 |
 | `Ctrl+b` → `←/→` | Herdrの前/次のタブへ移動 |
+| `Ctrl+b` → `↑/↓` | Herdrの前/次のワークスペースへ移動 |
+| `Ctrl+b` → `Shift+1〜9` | HerdrのAgentへ番号を指定して移動 |
 | `Ctrl+b` → `Shift+s` | Herdrの設定を開く |
 | `Ctrl+b` → `w` | Herdrのワークスペース一覧 |
 | `Ctrl+b` → `q` | Herdrからデタッチ |

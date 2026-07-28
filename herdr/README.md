@@ -54,6 +54,7 @@ Herdrの操作は、`Ctrl+b`を押して離してから操作キーを押しま�
 
 | キー | 動作 |
 | --- | --- |
+| `Ctrl+b` → `↑` / `↓` | 前後のWorkspaceへ移動する |
 | `Ctrl+b` → `w` | Workspace一覧を開く |
 | `Ctrl+b` → `Shift+n` | Workspaceを作成する |
 | `Ctrl+b` → `Shift+w` | Workspace名を変更する |
@@ -76,6 +77,12 @@ Named Sessionを使用します。
 
 `Cmd+1`〜`9`や`Ctrl+Tab`は外側のWezTermタブを移動します。Herdr内のTabを
 移動するときは、必ず`Ctrl+b`から操作します。
+
+### Agent
+
+| キー | 動作 |
+| --- | --- |
+| `Ctrl+b` → `Shift+1`〜`9` | 番号を指定してAgentへ移動する |
 
 ### Pane
 
