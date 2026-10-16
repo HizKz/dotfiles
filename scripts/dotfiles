@@ -2,8 +2,18 @@
 
 set -euo pipefail
 
+update_temporary_root=
+
+cleanup_update() {
+	if [[ -n "$update_temporary_root" ]]; then
+		rm -rf -- "$update_temporary_root"
+	fi
+}
+
+trap cleanup_update EXIT
+
 usage() {
-  cat <<'EOF'
+	cat <<'EOF'
 Usage:
   dotfiles [--repo PATH] check
   dotfiles [--repo PATH] doctor
@@ -17,57 +27,57 @@ EOF
 }
 
 die() {
-  printf 'error: %s\n' "$*" >&2
-  exit 1
+	printf 'error: %s\n' "$*" >&2
+	exit 1
 }
 
 repo_override=
 if [[ ${1:-} == "--repo" ]]; then
-  [[ $# -ge 3 ]] || die "--repo requires a path and a command"
-  repo_override=$2
-  shift 2
+	[[ $# -ge 3 ]] || die "--repo requires a path and a command"
+	repo_override=$2
+	shift 2
 fi
 
 command_name=${1:-}
 [[ -n "$command_name" ]] || {
-  usage
-  exit 2
+	usage
+	exit 2
 }
 shift
 
 resolve_repo() {
-  local candidate=
+	local candidate=
 
-  if [[ -n "$repo_override" ]]; then
-    candidate=$repo_override
-  elif candidate=$(git rev-parse --show-toplevel 2>/dev/null) &&
-    [[ -f "$candidate/flake.nix" && -x "$candidate/setup.sh" ]]; then
-    :
-  else
-    candidate=$(ghq list --full-path --exact Hizkz/dotfiles 2>/dev/null | head -n 1)
-  fi
+	if [[ -n "$repo_override" ]]; then
+		candidate=$repo_override
+	elif candidate=$(git rev-parse --show-toplevel 2>/dev/null) &&
+		[[ -f "$candidate/flake.nix" && -x "$candidate/setup.sh" ]]; then
+		:
+	else
+		candidate=$(ghq list --full-path --exact Hizkz/dotfiles 2>/dev/null | head -n 1)
+	fi
 
-  [[ -n "$candidate" ]] || die "could not locate the dotfiles repository; use --repo PATH"
-  candidate=$(cd "$candidate" && pwd -P)
-  [[ -f "$candidate/flake.nix" ]] || die "flake.nix was not found in $candidate"
-  [[ -x "$candidate/setup.sh" ]] || die "setup.sh is not executable in $candidate"
-  printf '%s\n' "$candidate"
+	[[ -n "$candidate" ]] || die "could not locate the dotfiles repository; use --repo PATH"
+	candidate=$(cd "$candidate" && pwd -P)
+	[[ -f "$candidate/flake.nix" ]] || die "flake.nix was not found in $candidate"
+	[[ -x "$candidate/setup.sh" ]] || die "setup.sh is not executable in $candidate"
+	printf '%s\n' "$candidate"
 }
 
 run_check() {
-  local repo_dir=$1
+	local repo_dir=$1
 
-  printf '==> checking Git whitespace\n'
-  git -C "$repo_dir" diff --check
+	printf '==> checking Git whitespace\n'
+	git -C "$repo_dir" diff --check
 
-  printf '==> running flake checks\n'
-  (
-    cd "$repo_dir"
-    nix flake check
-  )
+	printf '==> running flake checks\n'
+	(
+		cd "$repo_dir"
+		nix flake check
+	)
 
-  printf '==> checking managed links\n'
-  "$repo_dir/setup.sh" --dry-run
+	printf '==> checking managed links\n'
+	"$repo_dir/setup.sh" --dry-run
 }
 
 ok_count=0
@@ -75,219 +85,260 @@ warn_count=0
 fail_count=0
 
 report_ok() {
-  ok_count=$((ok_count + 1))
-  printf '[OK] %s\n' "$*"
+	ok_count=$((ok_count + 1))
+	printf '[OK] %s\n' "$*"
 }
 
 report_warn() {
-  warn_count=$((warn_count + 1))
-  printf '[WARN] %s\n' "$*"
+	warn_count=$((warn_count + 1))
+	printf '[WARN] %s\n' "$*"
 }
 
 report_fail() {
-  fail_count=$((fail_count + 1))
-  printf '[FAIL] %s\n' "$*"
+	fail_count=$((fail_count + 1))
+	printf '[FAIL] %s\n' "$*"
 }
 
 run_doctor() {
-  local repo_dir=$1
-  local user_home=${DOTFILES_HOME:-${HOME:-}}
-  local current_generation
-  local command_path
-  local lazygit_dir
-  local codex_history_path
-  local managed_command
+	local repo_dir=$1
+	local user_home=${DOTFILES_HOME:-${HOME:-}}
+	local current_generation
+	local command_path
+	local lazygit_dir
+	local codex_history_path
+	local managed_command
+	local profile_command
+	local setup_output
 
-  [[ -n "$user_home" ]] || die "neither DOTFILES_HOME nor HOME is set"
+	[[ -n "$user_home" ]] || die "neither DOTFILES_HOME nor HOME is set"
 
-  report_ok "repository: $repo_dir"
+	report_ok "repository: $repo_dir"
 
-  if [[ -z "$(git -C "$repo_dir" status --porcelain --untracked-files=normal)" ]]; then
-    report_ok "Git worktree is clean"
-  else
-    report_warn "Git worktree has uncommitted changes"
-  fi
+	if [[ -z "$(git -C "$repo_dir" status --porcelain --untracked-files=normal)" ]]; then
+		report_ok "Git worktree is clean"
+	else
+		report_warn "Git worktree has uncommitted changes"
+	fi
 
-  current_generation="$user_home/.local/state/nix/profiles/home-manager"
-  if [[ -L "$current_generation" ]]; then
-    report_ok "Home Manager generation: $(readlink "$current_generation")"
-  else
-    report_fail "Home Manager generation symlink is missing: $current_generation"
-  fi
+	current_generation="$user_home/.local/state/nix/profiles/home-manager"
+	if [[ -L "$current_generation" ]]; then
+		report_ok "Home Manager generation: $(readlink "$current_generation")"
+	else
+		report_fail "Home Manager generation symlink is missing: $current_generation"
+	fi
 
-  for managed_command in \
-    nix home-manager git gh ghq fzf herdr lazygit nvim spotify_player starship zoxide jq; do
-    if command_path=$(command -v "$managed_command" 2>/dev/null); then
-      report_ok "$managed_command: $command_path"
-    else
-      report_fail "required command is missing: $managed_command"
-    fi
-  done
+	if command_path=$(command -v nix 2>/dev/null); then
+		report_ok "nix: $command_path"
+	else
+		report_fail "required command is missing: nix"
+	fi
 
-  if command_path=$(command -v codex-history 2>/dev/null); then
-    report_ok "codex-history: $command_path"
-  else
-    report_warn "optional command is missing: codex-history"
-  fi
+	for managed_command in \
+		home-manager git gh ghq fzf herdr lazygit nvim spotify_player starship zoxide jq dotfiles; do
+		profile_command="$user_home/.nix-profile/bin/$managed_command"
+		if [[ -x "$profile_command" ]]; then
+			report_ok "$managed_command: $profile_command"
+		elif command_path=$(command -v "$managed_command" 2>/dev/null); then
+			report_warn "$managed_command is outside the Home Manager profile: $command_path"
+		else
+			report_fail "required command is missing: $managed_command"
+		fi
+	done
 
-  if "$repo_dir/setup.sh" --dry-run >/dev/null 2>&1; then
-    report_ok "managed symlink targets have no conflicts"
-  else
-    report_fail "managed symlink targets contain a conflict; run ./setup.sh --dry-run"
-  fi
+	if command_path=$(command -v codex-history 2>/dev/null); then
+		report_ok "codex-history: $command_path"
+	else
+		report_warn "optional command is missing: codex-history"
+	fi
 
-  if command -v lazygit >/dev/null 2>&1; then
-    lazygit_dir=$(lazygit --print-config-dir 2>/dev/null | head -n 1)
-    if [[ "$lazygit_dir" == "$user_home/.config/lazygit" ]]; then
-      report_ok "Lazygit config directory: $lazygit_dir"
-    else
-      report_fail "Lazygit config directory is $lazygit_dir, expected $user_home/.config/lazygit"
-    fi
-  fi
+	if setup_output=$("$repo_dir/setup.sh" --dry-run 2>&1); then
+		if grep -q '^create:' <<<"$setup_output"; then
+			report_warn "some managed symlinks are not installed; run ./setup.sh"
+		else
+			report_ok "managed symlink targets have no conflicts"
+		fi
+	else
+		report_fail "managed symlink targets contain a conflict; run ./setup.sh --dry-run"
+	fi
 
-  if command -v codex-history >/dev/null 2>&1; then
-    codex_history_path=$(codex-history config path 2>/dev/null | head -n 1)
-    if [[ "$codex_history_path" == "$user_home/Library/Application Support/codex-history/config.toml" ]]; then
-      report_ok "codex-history config path: $codex_history_path"
-    else
-      report_fail "codex-history config path is $codex_history_path"
-    fi
-  fi
+	if command -v lazygit >/dev/null 2>&1; then
+		lazygit_dir=$(lazygit --print-config-dir 2>/dev/null | head -n 1)
+		if [[ "$lazygit_dir" == "$user_home/.config/lazygit" ]]; then
+			report_ok "Lazygit config directory: $lazygit_dir"
+		else
+			report_fail "Lazygit config directory is $lazygit_dir, expected $user_home/.config/lazygit"
+		fi
+	fi
 
-  for managed_command in git gh ghq fzf herdr lazygit nvim spotify_player starship zoxide; do
-    if [[ -x "/opt/homebrew/bin/$managed_command" ]]; then
-      report_warn "Homebrew duplicate exists: /opt/homebrew/bin/$managed_command"
-    fi
-  done
+	if command -v codex-history >/dev/null 2>&1; then
+		codex_history_path=$(codex-history config path 2>/dev/null | head -n 1)
+		if [[ "$codex_history_path" == "$user_home/Library/Application Support/codex-history/config.toml" ]]; then
+			report_ok "codex-history config path: $codex_history_path"
+		else
+			report_fail "codex-history config path is $codex_history_path"
+		fi
+	fi
 
-  printf '\nSummary: %d ok, %d warning(s), %d failure(s)\n' \
-    "$ok_count" "$warn_count" "$fail_count"
-  ((fail_count == 0))
+	if [[ -f "$user_home/.config/git/config" ]]; then
+		if git config --file "$user_home/.config/git/config" --includes --get user.name >/dev/null &&
+			git config --file "$user_home/.config/git/config" --includes --get user.email >/dev/null; then
+			report_ok "Git identity remains available through the managed config"
+		else
+			report_fail "Git identity is not available through the managed config"
+		fi
+
+		if git config --file "$user_home/.config/git/config" --get pager.diff 2>/dev/null |
+			grep -q '/delta'; then
+			report_ok "Git diff pager uses delta"
+		else
+			report_fail "Git diff pager is not configured for delta"
+		fi
+
+		if [[ ${GIT_CONFIG_GLOBAL:-} == "$user_home/.config/git/config" ]]; then
+			report_ok "GIT_CONFIG_GLOBAL points to the managed Git config"
+		else
+			report_warn "open a new login shell to activate the managed Git config"
+		fi
+	else
+		report_fail "managed Git config is missing: $user_home/.config/git/config"
+	fi
+
+	for managed_command in git gh ghq fzf herdr lazygit nvim spotify_player starship zoxide; do
+		if [[ -x "/opt/homebrew/bin/$managed_command" ]]; then
+			report_warn "Homebrew duplicate exists: /opt/homebrew/bin/$managed_command"
+		fi
+	done
+
+	printf '\nSummary: %d ok, %d warning(s), %d failure(s)\n' \
+		"$ok_count" "$warn_count" "$fail_count"
+	((fail_count == 0))
 }
 
 run_update() {
-  local repo_dir=$1
-  local update_scope=${2:-unstable}
-  local user_home=${DOTFILES_HOME:-${HOME:-}}
-  local temporary_root
-  local candidate_dir
-  local candidate_activation
-  local current_profile
-  local original_profile_target=
-  local answer
-  local start_revision
-  local diff_status
+	local repo_dir=$1
+	local update_scope=${2:-unstable}
+	local user_home=${DOTFILES_HOME:-${HOME:-}}
+	local candidate_dir
+	local candidate_activation
+	local current_profile
+	local original_profile_target=
+	local answer
+	local start_revision
+	local diff_status
 
-  [[ -n "$user_home" ]] || die "neither DOTFILES_HOME nor HOME is set"
-  [[ "$update_scope" == "unstable" || "$update_scope" == "all" ]] ||
-    die "update scope must be 'unstable' or 'all'"
-  [[ -z "$(git -C "$repo_dir" status --porcelain --untracked-files=normal)" ]] ||
-    die "update requires a clean Git worktree"
+	[[ -n "$user_home" ]] || die "neither DOTFILES_HOME nor HOME is set"
+	[[ "$update_scope" == "unstable" || "$update_scope" == "all" ]] ||
+		die "update scope must be 'unstable' or 'all'"
+	[[ -z "$(git -C "$repo_dir" status --porcelain --untracked-files=normal)" ]] ||
+		die "update requires a clean Git worktree"
 
-  start_revision=$(git -C "$repo_dir" rev-parse HEAD)
-  temporary_root=$(mktemp -d "${TMPDIR:-/tmp}/dotfiles-update.XXXXXX")
-  candidate_dir="$temporary_root/repository"
-  mkdir -p "$candidate_dir"
-  trap 'rm -rf "$temporary_root"' RETURN
+	start_revision=$(git -C "$repo_dir" rev-parse HEAD)
+	update_temporary_root=$(mktemp -d "${TMPDIR:-/tmp}/dotfiles-update.XXXXXX")
+	candidate_dir="$update_temporary_root/repository"
+	mkdir -p "$candidate_dir"
 
-  git -C "$repo_dir" archive --format=tar HEAD | tar -xf - -C "$candidate_dir"
+	git -C "$repo_dir" archive --format=tar HEAD | tar -xf - -C "$candidate_dir"
 
-  printf '==> updating %s in an isolated repository\n' "$update_scope"
-  if [[ "$update_scope" == "unstable" ]]; then
-    (
-      cd "$candidate_dir"
-      nix flake update nixpkgs-unstable
-    )
-  else
-    (
-      cd "$candidate_dir"
-      nix flake update
-    )
-  fi
+	printf '==> updating %s in an isolated repository\n' "$update_scope"
+	if [[ "$update_scope" == "unstable" ]]; then
+		(
+			cd "$candidate_dir"
+			nix flake update nixpkgs-unstable
+		)
+	else
+		(
+			cd "$candidate_dir"
+			nix flake update
+		)
+	fi
 
-  if cmp -s "$repo_dir/flake.lock" "$candidate_dir/flake.lock"; then
-    printf 'flake.lock is already up to date\n'
-    return 0
-  fi
+	if cmp -s "$repo_dir/flake.lock" "$candidate_dir/flake.lock"; then
+		printf 'flake.lock is already up to date\n'
+		return 0
+	fi
 
-  printf '==> verifying the candidate\n'
-  (
-    cd "$candidate_dir"
-    nix flake check
-    nix build --no-link .#nixvim
-  )
-  candidate_activation=$(
-    cd "$candidate_dir"
-    nix build --no-link --print-out-paths .#homeConfigurations.apple.activationPackage
-  )
+	printf '==> verifying the candidate\n'
+	(
+		cd "$candidate_dir"
+		nix flake check
+		nix build --no-link .#nixvim
+	)
+	candidate_activation=$(
+		cd "$candidate_dir"
+		nix build --no-link --print-out-paths .#homeConfigurations.apple.activationPackage
+	)
 
-  current_profile="$user_home/.local/state/nix/profiles/home-manager"
-  if [[ -L "$current_profile" ]]; then
-    original_profile_target=$(readlink -f "$current_profile")
-    printf '==> closure changes\n'
-    nix store diff-closures "$original_profile_target" "$candidate_activation"
-  else
-    printf 'warning: current Home Manager profile was not found; closure diff skipped\n' >&2
-  fi
+	current_profile="$user_home/.local/state/nix/profiles/home-manager"
+	if [[ -L "$current_profile" ]]; then
+		original_profile_target=$(readlink -f "$current_profile")
+		printf '==> closure changes\n'
+		nix store diff-closures "$original_profile_target" "$candidate_activation"
+	else
+		printf 'warning: current Home Manager profile was not found; closure diff skipped\n' >&2
+	fi
 
-  printf '==> flake.lock changes\n'
-  set +e
-  git diff --no-index -- "$repo_dir/flake.lock" "$candidate_dir/flake.lock"
-  diff_status=$?
-  set -e
-  [[ $diff_status -eq 0 || $diff_status -eq 1 ]] ||
-    die "could not display flake.lock changes"
+	printf '==> flake.lock changes\n'
+	set +e
+	git diff --no-index -- "$repo_dir/flake.lock" "$candidate_dir/flake.lock"
+	diff_status=$?
+	set -e
+	[[ $diff_status -eq 0 || $diff_status -eq 1 ]] ||
+		die "could not display flake.lock changes"
 
-  [[ -r /dev/tty && -w /dev/tty ]] ||
-    die "an interactive terminal is required to apply the update"
-  printf 'Apply this flake.lock and switch Home Manager? [y/N] ' >/dev/tty
-  IFS= read -r answer </dev/tty
-  [[ "$answer" == "y" || "$answer" == "Y" ]] || {
-    printf 'update cancelled; no files were changed\n'
-    return 0
-  }
+	if [[ -n ${DOTFILES_TEST_CONFIRM:-} ]]; then
+		answer=$DOTFILES_TEST_CONFIRM
+	else
+		[[ -r /dev/tty && -w /dev/tty ]] ||
+			die "an interactive terminal is required to apply the update"
+		printf 'Apply this flake.lock and switch Home Manager? [y/N] ' >/dev/tty
+		IFS= read -r answer </dev/tty
+	fi
+	[[ "$answer" == "y" || "$answer" == "Y" ]] || {
+		printf 'update cancelled; no files were changed\n'
+		return 0
+	}
 
-  [[ "$(git -C "$repo_dir" rev-parse HEAD)" == "$start_revision" ]] ||
-    die "repository HEAD changed while the candidate was being checked"
-  [[ -z "$(git -C "$repo_dir" status --porcelain --untracked-files=normal)" ]] ||
-    die "worktree changed while the candidate was being checked"
+	[[ "$(git -C "$repo_dir" rev-parse HEAD)" == "$start_revision" ]] ||
+		die "repository HEAD changed while the candidate was being checked"
+	[[ -z "$(git -C "$repo_dir" status --porcelain --untracked-files=normal)" ]] ||
+		die "worktree changed while the candidate was being checked"
 
-  cp "$repo_dir/flake.lock" "$temporary_root/original-flake.lock"
-  install -m 0644 "$candidate_dir/flake.lock" "$repo_dir/flake.lock"
+	cp "$repo_dir/flake.lock" "$update_temporary_root/original-flake.lock"
+	install -m 0644 "$candidate_dir/flake.lock" "$repo_dir/flake.lock"
 
-  if ! home-manager switch --flake "$repo_dir#apple"; then
-    install -m 0644 "$temporary_root/original-flake.lock" "$repo_dir/flake.lock"
-    if [[ -n "$original_profile_target" &&
-      "$(readlink -f "$current_profile" 2>/dev/null || true)" != "$original_profile_target" ]]; then
-      home-manager switch --rollback || true
-    fi
-    die "Home Manager switch failed; flake.lock was restored"
-  fi
+	if ! home-manager switch --flake "$repo_dir#apple"; then
+		install -m 0644 "$update_temporary_root/original-flake.lock" "$repo_dir/flake.lock"
+		if [[ -n "$original_profile_target" &&
+			"$(readlink -f "$current_profile" 2>/dev/null || true)" != "$original_profile_target" ]]; then
+			home-manager switch --rollback || true
+		fi
+		die "Home Manager switch failed; flake.lock was restored"
+	fi
 
-  printf 'update applied successfully; review and commit flake.lock when ready\n'
-  git -C "$repo_dir" diff -- flake.lock
+	printf 'update applied successfully; review and commit flake.lock when ready\n'
+	git -C "$repo_dir" diff -- flake.lock
 }
 
 repo_dir=$(resolve_repo)
 
 case "$command_name" in
-  check)
-    [[ $# -eq 0 ]] || die "check does not accept positional arguments"
-    run_check "$repo_dir"
-    ;;
-  doctor)
-    [[ $# -eq 0 ]] || die "doctor does not accept positional arguments"
-    run_doctor "$repo_dir"
-    ;;
-  update)
-    [[ $# -le 1 ]] || die "update accepts at most one scope"
-    run_update "$repo_dir" "${1:-unstable}"
-    ;;
-  -h | --help | help)
-    usage
-    ;;
-  *)
-    usage >&2
-    exit 2
-    ;;
+check)
+	[[ $# -eq 0 ]] || die "check does not accept positional arguments"
+	run_check "$repo_dir"
+	;;
+doctor)
+	[[ $# -eq 0 ]] || die "doctor does not accept positional arguments"
+	run_doctor "$repo_dir"
+	;;
+update)
+	[[ $# -le 1 ]] || die "update accepts at most one scope"
+	run_update "$repo_dir" "${1:-unstable}"
+	;;
+-h | --help | help)
+	usage
+	;;
+*)
+	usage >&2
+	exit 2
+	;;
 esac

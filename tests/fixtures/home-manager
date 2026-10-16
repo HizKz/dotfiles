@@ -3,7 +3,7 @@
 set -eu
 
 if [ "${DOTFILES_TEST_SWITCH_FAIL:-0}" = 1 ] && [ "${1:-}" = switch ]; then
-  exit 1
+	exit 1
 fi
 
 exit 0

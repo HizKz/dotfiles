@@ -7,6 +7,7 @@
 
 let
   homeDirectory = config.home.homeDirectory;
+  gitConfigPath = "${config.xdg.configHome}/git/config";
 in
 {
   home.sessionPath = [
@@ -15,11 +16,33 @@ in
     "${homeDirectory}/.pyenv/bin"
   ];
 
+  home.sessionVariables.GIT_CONFIG_GLOBAL = gitConfigPath;
+
   programs = {
+    delta = {
+      enable = true;
+      package = pkgsUnstable.delta;
+      enableGitIntegration = true;
+      options = {
+        line-numbers = true;
+        navigate = true;
+      };
+    };
+
     fzf = {
       enable = true;
       package = pkgsUnstable.fzf;
       enableZshIntegration = true;
+    };
+
+    git = {
+      enable = true;
+      package = pkgsUnstable.git;
+      includes = [
+        {
+          path = "${homeDirectory}/.gitconfig";
+        }
+      ];
     };
 
     starship = {
@@ -44,6 +67,29 @@ in
       dotDir = "${config.xdg.configHome}/zsh";
       autocd = false;
       enableCompletion = true;
+
+      autosuggestion = {
+        enable = true;
+        strategy = [ "history" ];
+      };
+
+      syntaxHighlighting.enable = true;
+
+      history = {
+        append = true;
+        size = 50000;
+        save = 50000;
+        ignoreDups = true;
+        ignoreAllDups = true;
+        saveNoDups = true;
+        findNoDups = true;
+        ignoreSpace = true;
+        expireDuplicatesFirst = true;
+        extended = true;
+        share = true;
+      };
+
+      historySubstringSearch.enable = true;
 
       sessionVariables = {
         BUN_INSTALL = "${homeDirectory}/.bun";
@@ -90,6 +136,10 @@ in
           if command -v go >/dev/null 2>&1; then
             path+=("$(go env GOPATH)/bin")
           fi
+        '')
+
+        (lib.mkOrder 1400 ''
+          source ${./zsh/project-functions.zsh}
         '')
 
         (lib.mkOrder 1500 ''

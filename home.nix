@@ -1,4 +1,5 @@
 {
+  dotfilesCli,
   herdrPackage,
   nixvimPackage,
   pkgsUnstable,
@@ -18,18 +19,14 @@ let
       withSixel = false;
     }).overrideAttrs
       (old: {
-        patches =
-          (old.patches or [ ])
-          ++ [
-            ./patches/spotify-player-preserve-web-api-token.patch
-            ./patches/spotify-player-force-kitty-in-herdr.patch
-          ];
-        postPatch =
-          (old.postPatch or "")
-          + ''
-            patch -d "$cargoDepsCopy/source-registry-0/rspotify-0.15.3" -p1 \
-              < ${./patches/rspotify-preserve-refresh-token.patch}
-          '';
+        patches = (old.patches or [ ]) ++ [
+          ./patches/spotify-player-preserve-web-api-token.patch
+          ./patches/spotify-player-force-kitty-in-herdr.patch
+        ];
+        postPatch = (old.postPatch or "") + ''
+          patch -d "$cargoDepsCopy/source-registry-0/rspotify-0.15.3" -p1 \
+            < ${./patches/rspotify-preserve-refresh-token.patch}
+        '';
       });
 in
 {
@@ -41,9 +38,10 @@ in
     stateVersion = "26.05";
 
     packages = with pkgsUnstable; [
-      git
+      dotfilesCli
       gh
       ghq
+      jq
       lazygit
       nixvimPackage
       spotifyPlayer
