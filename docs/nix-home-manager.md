@@ -8,7 +8,7 @@
 
 | 対象 | 管理方法 |
 | --- | --- |
-| Git、gh、ghq、fzf、Herdr、lazygit、Neovim、spotify-player、Starship、Zoxide、Zsh、Oh My Zsh | Home Manager |
+| Git、gh、ghq、fzf、Herdr、jq、lazygit、Neovim、spotify-player、Starship、Zoxide、Zsh、Oh My Zsh、delta、dotfiles CLI | Home Manager |
 | Neovim設定と開発ツール | Nixvim standalone package |
 | WezTerm、Karabiner、Starship、Herdr、lazygitの設定 | `setup.sh`によるシンボリックリンク |
 | GUIアプリ、Homebrew cask | Homebrew |
@@ -34,15 +34,26 @@ setup.sh    ~/.config以下の設定リンクを作成・解除
 
 ## 日常の操作
 
-設定を変更したら、リポジトリルートで次を実行します。
+設定を変更したら、リポジトリルートで統合チェックを実行します。
 
 ```sh
-nix flake check
+dotfiles check
+```
+
+`dotfiles check`は`nix flake check`、Gitのwhitespace検査、設定リンクのdry-runを
+実行します。flake checkにはHome Manager activationとNixvim packageのbuildも
+含まれます。問題がなければ新しいgenerationを有効化します。
+
+```sh
 home-manager switch --flake .#apple
 ```
 
-`nix flake check`は構成を評価します。`home-manager switch`は必要なパッケージを
-取得・ビルドして、新しいgenerationを有効化します。
+実環境で参照されているコマンド、generation、設定リンク、アプリの設定読込先を
+まとめて調べる場合はdoctorを使用します。
+
+```sh
+dotfiles doctor
+```
 
 現在のgenerationは次で確認できます。
 
@@ -54,7 +65,7 @@ home-manager generations
 次を実行します。
 
 ```sh
-command -v git gh ghq fzf herdr lazygit nvim spotify_player starship zoxide home-manager
+command -v dotfiles git gh ghq fzf herdr jq lazygit nvim spotify_player starship zoxide delta home-manager
 ```
 
 各パスが基本的に`/Users/apple/.nix-profile/bin/`から始まれば正常です。
@@ -64,8 +75,10 @@ command -v git gh ghq fzf herdr lazygit nvim spotify_player starship zoxide home
 ## Zsh設定
 
 共通のZsh設定はHome Managerが生成します。`~/.zshenv`から
-`~/.config/zsh`以下の設定を読み込み、Oh My Zsh、Starship、Zoxide、fzfの
-初期化もHome Managerが行います。Starshipの設定本体は従来どおり
+`~/.config/zsh`以下の設定を読み込み、Oh My Zsh、Starship、Zoxide、fzf、
+autosuggestion、syntax highlightingの初期化もHome Managerが行います。
+履歴は50,000件保存し、複数のZshセッションで共有します。入力途中の上下矢印は、
+入力済み文字列に一致する履歴だけを検索します。Starshipの設定本体は従来どおり
 `setup.sh`が作成する`~/.config/starship.toml`のリンクを使用します。
 
 端末や仕事環境に固有のパス、エイリアスは次のファイルへ置きます。
@@ -92,6 +105,22 @@ home-manager switch --flake .#apple
 echo "$ZDOTDIR"
 command -v zsh starship zoxide fzf
 bindkey '^R'
+```
+
+ghq管理リポジトリをfzfで選んで現在のシェルから移動する場合は`cproj`を使います。
+検索語を引数で渡すこともできます。
+
+```sh
+cproj
+cproj dotfiles
+```
+
+選択したリポジトリをHerdr workspaceで開く場合は`wproj`を使います。すでに同じ
+リポジトリ内のPaneがあればそのWorkspaceへ移動し、なければ新しく作成します。
+
+```sh
+wproj
+wproj dotfiles
 ```
 
 以前の手動設定へ戻す場合は、Home Managerのgenerationを戻してから、移行時に
@@ -145,7 +174,12 @@ Herdr内では端末機能の自動照会が外側のWezTermまで届かず、�
 正確な縦横比が必要な場合は`Ctrl+t`または`Cmd+t`で素のWezTermタブを開き、
 Herdrを介さず`spotify_player`を起動します。
 
-Zsh、fzf、Starship、Zoxideは`shell.nix`の各`programs`モジュールで管理します。
+Zsh、fzf、Git、delta、Starship、Zoxideは`shell.nix`の各`programs`モジュールで
+管理します。Gitのuser nameとemailは既存の`~/.gitconfig`に残し、このリポジトリ
+では管理しません。deltaは`git diff`、`log`、`show`、`blame`とinteractive staging
+の表示に使用します。Home Managerが生成する`~/.config/git/config`から既存の
+`~/.gitconfig`をincludeし、`GIT_CONFIG_GLOBAL`で生成済み設定を選択するため、
+identityとdelta設定の両方が有効になります。
 
 通常のパッケージ名はNixpkgs Searchで確認します。Herdrは公式flakeを
 `flake.nix`のinputへ追加し、`herdrPackage`として渡しています。一覧やinputを
@@ -167,7 +201,14 @@ GUIアプリやcaskは無理にNixへ移さず、Homebrew管理を継続しま�
 
 ## 依存を更新する
 
-CLIパッケージだけ更新する場合は次を使います。
+通常は統合CLIを使い、一時リポジトリでbuildとclosure差分を確認してから
+`flake.lock`とHome Managerへ反映します。
+
+```sh
+dotfiles update
+```
+
+CLIパッケージだけを手動更新する場合は次を使います。
 
 ```sh
 nix flake update nixpkgs-unstable
@@ -189,6 +230,12 @@ Home Managerや安定版Nixpkgsを含めてすべて更新する場合は次を�
 nix flake update
 nix flake check
 home-manager switch --flake .#apple
+```
+
+すべての入力を安全な更新フローで確認する場合は`all`を指定します。
+
+```sh
+dotfiles update all
 ```
 
 すべての入力を更新するとHome Manager側の変更も取り込むため、通常は
@@ -235,14 +282,15 @@ Nixのactivationは、既存の設定リンクを管理しません。リンク�
 ./setup.sh
 ```
 
-正常な場合、dry-runでは次の5リンクが`unchanged`と表示されます。
+正常な場合、dry-runでは次の6リンクが`unchanged`と表示されます。
 
 ```text
 ~/.config/wezterm
 ~/.config/karabiner
 ~/.config/starship.toml
 ~/.config/herdr/config.toml
-~/Library/Application Support/lazygit/config.yml
+~/.config/lazygit/config.yml
+~/Library/Application Support/codex-history/config.toml
 ```
 
 NeovimはNixvim packageへ移行したため、`setup.sh`ではリンクしません。旧LazyVim
@@ -254,9 +302,10 @@ Herdrは`~/.config/herdr`へログも保存するため、ディレクトリ全�
 `config.toml`だけをリンクします。`./setup.sh --remove`を実行しても、ログが
 残る可能性がある`~/.config/herdr`ディレクトリは削除しません。
 
-LazygitはmacOS上で`~/Library/Application Support/lazygit`を使用します。
+現在のLazygitは`~/.config/lazygit`を設定ディレクトリとして返します。
 設定ファイルの`config.yml`だけをリンクし、端末固有の状態を保存する`state.yml`は
-管理しません。
+管理しません。以前の`~/Library/Application Support/lazygit/config.yml`がこの
+リポジトリを指すリンクの場合は、`setup.sh`が旧リンクを解除します。
 
 ## トラブルシューティング
 
