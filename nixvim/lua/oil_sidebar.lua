@@ -2,10 +2,13 @@ local M = {}
 
 local oil = require("oil")
 local sidebar_width_ratio = 0.25
-local sidebar_min_width = 34
+local sidebar_min_width = 20
+local main_min_width = 30
 
 local function get_sidebar_target_width()
-  return math.max(sidebar_min_width, math.floor(vim.o.columns * sidebar_width_ratio))
+  local preferred_width = math.max(sidebar_min_width, math.floor(vim.o.columns * sidebar_width_ratio))
+  local max_width = math.max(1, vim.o.columns - main_min_width)
+  return math.min(preferred_width, max_width)
 end
 
 local function resize_sidebar(win)
@@ -159,21 +162,30 @@ local function open_sidebar(opts)
 end
 
 function M.select_entry()
+  local current_win = vim.api.nvim_get_current_win()
+  if vim.bo.filetype ~= "oil" then
+    return
+  end
+
   local entry = oil.get_cursor_entry()
   if not entry then
     return
   end
 
-  local current_win = vim.api.nvim_get_current_win()
   local is_sidebar = vim.w[current_win].oil_sidebar == true
+  if not is_sidebar then
+    require("oil.actions").select.callback()
+    return
+  end
+
+  local dir = oil.get_current_dir()
   local main_win = ensure_main_window({
     sidebar_win = current_win,
     preferred_win = vim.w[current_win].oil_main_win,
   })
 
-  if is_sidebar and main_win then
+  if main_win then
     vim.w[current_win].oil_main_win = main_win
-    local dir = oil.get_current_dir()
     local path = dir and vim.fs.joinpath(dir, entry.name) or nil
     if path and vim.fn.isdirectory(path) == 0 then
       vim.api.nvim_win_call(main_win, function()
@@ -184,35 +196,14 @@ function M.select_entry()
     end
   end
 
-  require("oil.actions").select.callback()
+  vim.api.nvim_win_call(current_win, function()
+    require("oil.actions").select.callback()
+  end)
 end
 
 function M.setup()
   local layout_group = vim.api.nvim_create_augroup("oil_sidebar_layout", { clear = true })
   local ui_group = vim.api.nvim_create_augroup("oil_sidebar_ui", { clear = true })
-  local startup_handled = false
-
-  local function handle_startup()
-    if startup_handled then
-      return
-    end
-    startup_handled = true
-
-    vim.schedule(function()
-      if vim.fn.argc() == 0 or vim.bo.filetype == "snacks_dashboard" then
-        return
-      end
-      local started_in_oil = vim.bo.filetype == "oil"
-      if started_in_oil then
-        open_sidebar({ toggle = false, reuse_current = true })
-        vim.schedule(function()
-          vim.cmd("OilSidebarFocus")
-        end)
-      else
-        open_sidebar({ toggle = true })
-      end
-    end)
-  end
 
   vim.api.nvim_create_user_command("OilSidebar", function()
     open_sidebar({ toggle = true })
@@ -256,15 +247,6 @@ function M.setup()
       vim.opt_local.winbar = dir and ("  " .. vim.fn.fnamemodify(dir, ":~")) or "  Explorer"
     end,
   })
-
-  vim.api.nvim_create_autocmd("VimEnter", {
-    group = ui_group,
-    callback = handle_startup,
-  })
-
-  if vim.v.vim_did_enter == 1 then
-    handle_startup()
-  end
 
   vim.api.nvim_create_autocmd("User", {
     group = ui_group,

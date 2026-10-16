@@ -88,6 +88,7 @@ in
     smear-cursor.enable = true;
     render-markdown.enable = true;
     markdown-preview.enable = true;
+    schemastore.enable = true;
     copilot-vim.enable = true;
     ts-autotag.enable = true;
     ts-comments.enable = true;
@@ -128,9 +129,11 @@ in
         lua
         markdown
         markdown_inline
+        nix
         python
         query
         regex
+        toml
         tsx
         typescript
         vim
@@ -181,22 +184,39 @@ in
   };
 
   keymaps = [
-    (normal "<leader>?" { __raw = "function() require('which-key').show({ global = false }) end"; } "Buffer Keymaps")
+    (normal "<leader>?" {
+      __raw = "function() require('which-key').show({ global = false }) end";
+    } "Buffer Keymaps")
     (normal "<leader>j" { __raw = "function() require('flash').jump() end"; } "Flash Jump")
     (normal "<leader>J" { __raw = "function() require('flash').treesitter() end"; } "Flash Treesitter")
 
     (normal "<leader>," "<cmd>Telescope buffers sort_mru=true sort_lastused=true<cr>" "Switch Buffer")
-    (normal "<leader>/" { __raw = "function() require('telescope.builtin').live_grep({ cwd = ${projectRoot} }) end"; } "Grep Project")
+    (normal "<leader>/" {
+      __raw = "function() require('telescope.builtin').live_grep({ cwd = ${projectRoot} }) end";
+    } "Grep Project")
     (normal "<leader>:" "<cmd>Telescope command_history<cr>" "Command History")
-    (normal "<leader><space>" { __raw = "function() require('telescope.builtin').find_files({ cwd = ${projectRoot} }) end"; } "Find Files in Project")
-    (normal "<leader>fb" "<cmd>Telescope buffers sort_mru=true sort_lastused=true ignore_current_buffer=true<cr>" "Buffers")
+    (normal "<leader><space>" {
+      __raw = "function() require('telescope.builtin').find_files({ cwd = ${projectRoot} }) end";
+    } "Find Files in Project")
+    (normal "<leader>fb"
+      "<cmd>Telescope buffers sort_mru=true sort_lastused=true ignore_current_buffer=true<cr>"
+      "Buffers"
+    )
     (normal "<leader>fB" "<cmd>Telescope buffers<cr>" "All Buffers")
-    (normal "<leader>ff" { __raw = "function() require('telescope.builtin').find_files({ cwd = ${projectRoot} }) end"; } "Find Files in Project")
-    (normal "<leader>fF" { __raw = "function() require('telescope.builtin').find_files({ cwd = vim.uv.cwd() }) end"; } "Find Files in cwd")
-    (normal "<leader>fg" { __raw = "function() require('telescope.builtin').git_files({ cwd = ${projectRoot} }) end"; } "Find Git Files")
+    (normal "<leader>ff" {
+      __raw = "function() require('telescope.builtin').find_files({ cwd = ${projectRoot} }) end";
+    } "Find Files in Project")
+    (normal "<leader>fF" {
+      __raw = "function() require('telescope.builtin').find_files({ cwd = vim.uv.cwd() }) end";
+    } "Find Files in cwd")
+    (normal "<leader>fg" {
+      __raw = "function() require('telescope.builtin').git_files({ cwd = ${projectRoot} }) end";
+    } "Find Git Files")
     (normal "<leader>fp" "<cmd>Telescope projects<cr>" "Projects")
     (normal "<leader>fr" "<cmd>Telescope oldfiles<cr>" "Recent Files")
-    (normal "<leader>fR" { __raw = "function() require('telescope.builtin').oldfiles({ cwd = vim.uv.cwd(), only_cwd = true }) end"; } "Recent Files in cwd")
+    (normal "<leader>fR" {
+      __raw = "function() require('telescope.builtin').oldfiles({ cwd = vim.uv.cwd(), only_cwd = true }) end";
+    } "Recent Files in cwd")
 
     (normal "<leader>gc" "<cmd>Telescope git_commits<cr>" "Git Commits")
     (normal "<leader>gl" "<cmd>Telescope git_commits<cr>" "Git Log")
@@ -210,8 +230,12 @@ in
     (normal "<leader>sC" "<cmd>Telescope commands<cr>" "Commands")
     (normal "<leader>sd" "<cmd>Telescope diagnostics<cr>" "Diagnostics")
     (normal "<leader>sD" "<cmd>Telescope diagnostics bufnr=0<cr>" "Buffer Diagnostics")
-    (normal "<leader>sg" { __raw = "function() require('telescope.builtin').live_grep({ cwd = ${projectRoot} }) end"; } "Grep Project")
-    (normal "<leader>sG" { __raw = "function() require('telescope.builtin').live_grep({ cwd = vim.uv.cwd() }) end"; } "Grep cwd")
+    (normal "<leader>sg" {
+      __raw = "function() require('telescope.builtin').live_grep({ cwd = ${projectRoot} }) end";
+    } "Grep Project")
+    (normal "<leader>sG" {
+      __raw = "function() require('telescope.builtin').live_grep({ cwd = vim.uv.cwd() }) end";
+    } "Grep cwd")
     (normal "<leader>sh" "<cmd>Telescope help_tags<cr>" "Help Pages")
     (normal "<leader>sH" "<cmd>Telescope highlights<cr>" "Highlight Groups")
     (normal "<leader>sj" "<cmd>Telescope jumplist<cr>" "Jumplist")
@@ -224,14 +248,26 @@ in
     (normal "<leader>sR" "<cmd>Telescope resume<cr>" "Resume Search")
     (normal "<leader>ss" "<cmd>Telescope lsp_document_symbols<cr>" "Document Symbols")
     (normal "<leader>sS" "<cmd>Telescope lsp_dynamic_workspace_symbols<cr>" "Workspace Symbols")
-    (normal "<leader>sw" { __raw = "function() require('telescope.builtin').grep_string({ cwd = ${projectRoot}, word_match = '-w' }) end"; } "Search Word in Project")
-    (normal "<leader>sW" { __raw = "function() require('telescope.builtin').grep_string({ cwd = vim.uv.cwd(), word_match = '-w' }) end"; } "Search Word in cwd")
-    (mapKey "x" "<leader>sw" { __raw = "function() require('telescope.builtin').grep_string({ cwd = ${projectRoot} }) end"; } "Search Selection in Project")
-    (mapKey "x" "<leader>sW" { __raw = "function() require('telescope.builtin').grep_string({ cwd = vim.uv.cwd() }) end"; } "Search Selection in cwd")
+    (normal "<leader>sw" {
+      __raw = "function() require('telescope.builtin').grep_string({ cwd = ${projectRoot}, word_match = '-w' }) end";
+    } "Search Word in Project")
+    (normal "<leader>sW" {
+      __raw = "function() require('telescope.builtin').grep_string({ cwd = vim.uv.cwd(), word_match = '-w' }) end";
+    } "Search Word in cwd")
+    (mapKey "x" "<leader>sw" {
+      __raw = "function() require('telescope.builtin').grep_string({ cwd = ${projectRoot} }) end";
+    } "Search Selection in Project")
+    (mapKey "x" "<leader>sW" {
+      __raw = "function() require('telescope.builtin').grep_string({ cwd = vim.uv.cwd() }) end";
+    } "Search Selection in cwd")
 
     (mapKey [ "n" "x" ] "<leader>sr" "<cmd>GrugFar<cr>" "Search and Replace")
-    (normal "]h" { __raw = "function() if vim.wo.diff then vim.cmd.normal({ ']c', bang = true }) else require('gitsigns').nav_hunk('next') end end"; } "Next Hunk")
-    (normal "[h" { __raw = "function() if vim.wo.diff then vim.cmd.normal({ '[c', bang = true }) else require('gitsigns').nav_hunk('prev') end end"; } "Previous Hunk")
+    (normal "]h" {
+      __raw = "function() if vim.wo.diff then vim.cmd.normal({ ']c', bang = true }) else require('gitsigns').nav_hunk('next') end end";
+    } "Next Hunk")
+    (normal "[h" {
+      __raw = "function() if vim.wo.diff then vim.cmd.normal({ '[c', bang = true }) else require('gitsigns').nav_hunk('prev') end end";
+    } "Previous Hunk")
     (normal "]H" { __raw = "function() require('gitsigns').nav_hunk('last') end"; } "Last Hunk")
     (normal "[H" { __raw = "function() require('gitsigns').nav_hunk('first') end"; } "First Hunk")
     (mapKey [ "n" "x" ] "<leader>ghs" "<cmd>Gitsigns stage_hunk<cr>" "Stage Hunk")
@@ -254,22 +290,38 @@ in
     (normal "]t" { __raw = "function() require('todo-comments').jump_next() end"; } "Next Todo")
     (normal "[t" { __raw = "function() require('todo-comments').jump_prev() end"; } "Previous Todo")
     (normal "<leader>xt" "<cmd>Trouble todo toggle<cr>" "Todo List")
-    (normal "<leader>xT" "<cmd>Trouble todo toggle filter = {tag = {TODO,FIX,FIXME}}<cr>" "Todo/Fix/Fixme List")
+    (normal "<leader>xT" "<cmd>Trouble todo toggle filter = {tag = {TODO,FIX,FIXME}}<cr>"
+      "Todo/Fix/Fixme List"
+    )
     (normal "<leader>st" "<cmd>TodoTelescope<cr>" "Todo Search")
     (normal "<leader>sT" "<cmd>TodoTelescope keywords=TODO,FIX,FIXME<cr>" "Todo/Fix/Fixme Search")
 
-    (normal "<leader>snl" { __raw = "function() require('noice').cmd('last') end"; } "Noice Last Message")
+    (normal "<leader>snl" {
+      __raw = "function() require('noice').cmd('last') end";
+    } "Noice Last Message")
     (normal "<leader>snh" { __raw = "function() require('noice').cmd('history') end"; } "Noice History")
-    (normal "<leader>sna" { __raw = "function() require('noice').cmd('all') end"; } "Noice All Messages")
-    (normal "<leader>snd" { __raw = "function() require('noice').cmd('dismiss') end"; } "Dismiss Noice Messages")
-    (normal "<leader>snt" { __raw = "function() require('noice').cmd('pick') end"; } "Noice Message Picker")
-    (normal "<leader>n" { __raw = "function() Snacks.notifier.show_history() end"; } "Notification History")
+    (normal "<leader>sna" {
+      __raw = "function() require('noice').cmd('all') end";
+    } "Noice All Messages")
+    (normal "<leader>snd" {
+      __raw = "function() require('noice').cmd('dismiss') end";
+    } "Dismiss Noice Messages")
+    (normal "<leader>snt" {
+      __raw = "function() require('noice').cmd('pick') end";
+    } "Noice Message Picker")
+    (normal "<leader>n" {
+      __raw = "function() Snacks.notifier.show_history() end";
+    } "Notification History")
     (normal "<leader>un" { __raw = "function() Snacks.notifier.hide() end"; } "Dismiss Notifications")
 
     (normal "<leader>qs" { __raw = "function() require('persistence').load() end"; } "Restore Session")
     (normal "<leader>qS" { __raw = "function() require('persistence').select() end"; } "Select Session")
-    (normal "<leader>ql" { __raw = "function() require('persistence').load({ last = true }) end"; } "Restore Last Session")
-    (normal "<leader>qd" { __raw = "function() require('persistence').stop() end"; } "Do Not Save Session")
+    (normal "<leader>ql" {
+      __raw = "function() require('persistence').load({ last = true }) end";
+    } "Restore Last Session")
+    (normal "<leader>qd" {
+      __raw = "function() require('persistence').stop() end";
+    } "Do Not Save Session")
     (normal "<leader>cp" "<cmd>MarkdownPreviewToggle<cr>" "Toggle Markdown Preview")
   ];
 

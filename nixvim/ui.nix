@@ -218,7 +218,7 @@ in
                 gui = "bold";
               };
               b = {
-                fg = palette.fg;
+                inherit (palette) fg;
                 bg = palette.bg_tab_bar;
               };
               c = {

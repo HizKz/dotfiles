@@ -43,6 +43,10 @@ in
         };
       };
       servers = {
+        bashls = {
+          enable = true;
+          package = null;
+        };
         gopls = {
           enable = true;
           package = null;
@@ -69,6 +73,24 @@ in
             };
           };
         };
+        jsonls = {
+          enable = true;
+          package = null;
+        };
+        lua_ls = {
+          enable = true;
+          package = null;
+          settings = {
+            diagnostics.globals = [ "vim" ];
+            telemetry.enable = false;
+            workspace.checkThirdParty = false;
+          };
+        };
+        nil_ls = {
+          enable = true;
+          package = null;
+          settings.formatting.command = [ "nixfmt" ];
+        };
         pyright = {
           enable = true;
           package = null;
@@ -76,6 +98,10 @@ in
             extraPaths = [ "./" ];
             typeCheckingMode = "basic";
           };
+        };
+        taplo = {
+          enable = true;
+          package = null;
         };
         ts_ls = {
           enable = true;
@@ -86,6 +112,10 @@ in
           package = null;
           tslsIntegration = false;
         };
+        yamlls = {
+          enable = true;
+          package = null;
+        };
       };
     };
 
@@ -93,6 +123,7 @@ in
       enable = true;
       settings = {
         formatters_by_ft = {
+          bash = [ "shfmt" ];
           go = [
             "goimports"
             "gofumpt"
@@ -103,9 +134,16 @@ in
           ];
           javascript = [ "prettier" ];
           javascriptreact = [ "prettier" ];
+          json = [ "prettier" ];
+          jsonc = [ "prettier" ];
+          lua = [ "stylua" ];
+          nix = [ "nixfmt" ];
           typescript = [ "prettier" ];
           typescriptreact = [ "prettier" ];
+          sh = [ "shfmt" ];
+          toml = [ "taplo" ];
           vue = [ "prettier" ];
+          yaml = [ "prettier" ];
         };
         format_on_save = {
           timeout_ms = 3000;
@@ -119,8 +157,10 @@ in
     lint = {
       enable = true;
       lintersByFt = {
+        bash = [ "shellcheck" ];
         go = [ "golangcilint" ];
         python = [ "ruff" ];
+        sh = [ "shellcheck" ];
         markdown = [ ];
       };
     };
@@ -136,7 +176,9 @@ in
     (mapKey "n" "gK" { __raw = "vim.lsp.buf.signature_help"; } "Signature Help")
     (mapKey "i" "<C-k>" { __raw = "vim.lsp.buf.signature_help"; } "Signature Help")
     (mapKey "x" "<leader>ca" { __raw = "vim.lsp.buf.code_action"; } "Code Action")
-    (mapKey [ "n" "x" ] "<leader>cf" { __raw = "function() require('conform').format({ async = true, lsp_format = 'fallback' }) end"; } "Format")
+    (mapKey [ "n" "x" ] "<leader>cf" {
+      __raw = "function() require('conform').format({ async = true, lsp_format = 'fallback' }) end";
+    } "Format")
     (mapKey "n" "<leader>cl" "<cmd>LspInfo<cr>" "LSP Info")
     (mapKey [ "n" "x" ] "<leader>cc" { __raw = "vim.lsp.codelens.run"; } "Run Codelens")
     (mapKey "n" "<leader>cC" { __raw = "vim.lsp.codelens.refresh"; } "Refresh Codelens")

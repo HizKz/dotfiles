@@ -23,7 +23,8 @@ nix flake check
 - `base.nix`: Neovimの共通オプション
 - `keymaps.nix`: `k/t/n/s`を含むグローバルキーマップ
 - `plugins.nix`: 検索、補完、Treesitter、Markdownなどのプラグイン
-- `languages.nix`: Go、Python、TypeScript、VueのLSP・format・lint
+- `languages.nix`: Nix、Shell、Lua、TOML、JSON、YAML、Go、Python、
+  TypeScript、VueのLSP・format・lint
 - `ui.nix`: Kanagawa配色、Dashboard、bufferline、lualine
 - `oil.nix`: Oilの設定とサイドバー制御の読込
 - `lua/`: 命令的なUI処理と生成済みDashboardアート
@@ -32,9 +33,11 @@ nix flake check
 制御、Markdown buffer固有の表示調整、生成済みDashboardアートに限定しています。
 旧LazyVim構成やlock fileは使用しません。
 
-引数なしの起動ではDashboardを全幅表示し、Oilサイドバーは開きません。ファイル・
-ディレクトリを指定した起動ではサイドバーを自動表示し、Dashboardから必要になった
-場合は`<leader>e`で開けます。
+引数なしの起動ではDashboardを全幅表示します。ファイルを指定して起動した場合も
+Oilサイドバーは自動表示せず、必要なときに`<leader>e`で開きます。
+ディレクトリを指定して起動した場合は、Oilがメイン画面にファイル一覧を表示します。
+サイドバーは画面幅の25%を目安にし、狭い端末ではメイン編集領域が30列残るように
+縮小します。
 
 ## 主なキーマップ
 
@@ -118,4 +121,7 @@ nix flake check
 ```
 
 Neovim内の`vim.fn.exepath()`や`:LspInfo`で、Nixvim wrapper内の`gopls`、
-`pyright`、`typescript-language-server`、`vue-language-server`を確認できます。
+`pyright`、`typescript-language-server`、`vue-language-server`に加え、
+`nil`、`bash-language-server`、`lua-language-server`、`taplo`、
+`vscode-json-language-server`、`yaml-language-server`を確認できます。
+JSONとYAMLではSchemaStoreのschemaを使用します。
