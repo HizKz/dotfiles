@@ -6,6 +6,8 @@
 
 NixとHome Managerの日常的な使い方、更新、ロールバック、トラブル対応は
 [`docs/nix-home-manager.md`](docs/nix-home-manager.md) を参照してください。
+統合CLIの検証、診断、安全な依存更新は
+[`docs/dotfiles-cli.md`](docs/dotfiles-cli.md)を参照してください。
 
 ## 配置場所
 
@@ -55,6 +57,18 @@ NIX_CONFIG='experimental-features = nix-command flakes' \
 
 ## 日常の操作
 
+設定と実環境のリンクをまとめて検証します。
+
+```sh
+dotfiles check
+```
+
+PATH、Home Manager generation、設定リンク、各アプリの設定読込先を診断します。
+
+```sh
+dotfiles doctor
+```
+
 Home Manager設定を反映します。
 
 ```sh
@@ -67,11 +81,10 @@ home-manager switch --flake .#apple
 nix run .#nixvim
 ```
 
-依存を更新してから反映する場合は、lock fileを更新します。
+通常のCLI依存を安全に更新し、候補のビルドと差分を確認してから反映します。
 
 ```sh
-nix flake update
-home-manager switch --flake .#apple
+dotfiles update
 ```
 
 以前のHome Manager generationへ戻す場合は、一覧に表示される対象の
@@ -84,9 +97,9 @@ home-manager generations
 
 ## 管理範囲
 
-Home Managerでは、Git、GitHub CLI、ghq、fzf、Herdr、lazygit、Neovim、spotify-player、
-Starship、Zoxide、Zsh、Oh My Zshを管理します。Neovim設定はNixvimで生成します。
-GUIアプリ、Homebrew cask、
+Home Managerでは、Git、GitHub CLI、ghq、fzf、Herdr、jq、lazygit、Neovim、
+spotify-player、Starship、Zoxide、Zsh、Oh My Zsh、delta、dotfiles CLIを管理します。
+Neovim設定はNixvimで生成します。GUIアプリ、Homebrew cask、
 言語ランタイムは引き続きそれぞれの既存手段で管理します。
 
 spotify-playerはmacOSで0.24.0を利用できるよう、補助機能を絞ったNixパッケージを
@@ -97,6 +110,10 @@ spotify-playerはmacOSで0.24.0を利用できるよう、補助機能を絞っ�
 Zshの共通設定は[`shell.nix`](shell.nix)で管理します。端末や仕事環境に固有の
 設定は`~/.config/zsh/local.zsh`へ置きます。このファイルは存在する場合だけ
 読み込まれ、Gitでは管理しません。
+
+Zshでは履歴候補と構文ハイライトが有効です。入力途中で上下矢印を押すと、
+入力済み文字列に一致する履歴だけを検索します。ghq管理リポジトリへ移動する
+`cproj`と、Herdr workspaceで開く`wproj`も利用できます。
 
 ## 管理対象のリンク
 
@@ -124,6 +141,8 @@ Nixvimの構成と検証方法は[`nixvim/README.md`](nixvim/README.md)を参照
 Karabinerの設定構成、反映確認、トラブルシューティングは
 [`karabiner/README.md`](karabiner/README.md) を参照してください。
 
+WezTermはログインzshで起動し、普段のタブ・ペイン操作はWezTermで行います。
+セッションを残したい作業では、シェルから`herdr`を実行して接続します。
 HerdrとWezTermの役割分担、起動方法、キーバインド、セッション運用は
 [`herdr/README.md`](herdr/README.md) を参照してください。
 

@@ -38,19 +38,14 @@ Home Managerで、NeovimはNixvim、その他のアプリケーション設定�
 
 ## 検証
 
-通常の変更では次を実行する。
+通常の変更では、flake内の静的検査、Nixvim、Home Manager activation、
+CLI fixture、`setup.sh` fixtureをまとめて実行する。
 
 ```sh
-nix flake check
-nix build --no-link .#nixvim
-nix build --no-link .#homeConfigurations.apple.activationPackage
-sh -n setup.sh karabiner/add-o24-keyboard.sh
-for file in karabiner/karabiner.json karabiner/o24-layouts.json \
-  karabiner/assets/complex_modifications/*.json; do
-  jq empty "$file"
-done
+nix run .#check
 ```
 
-設定リンクまたは`setup.sh`を変更した場合は、実機へ反映する前に追加で
-`./setup.sh --dry-run`を実行する。Zsh設定を変更した場合は、新しいログインシェルで
-`ZDOTDIR`、主要コマンドの参照先、補完とキーバインドを確認する。
+`dotfiles`がまだHome Managerへ導入されていないbootstrap中は、代わりに
+`nix flake check`と`./setup.sh --dry-run`を実行する。Zsh設定を変更した場合は、
+新しいログインシェルで`ZDOTDIR`、主要コマンドの参照先、補完とキーバインドを
+確認する。
