@@ -1,0 +1,24 @@
+#!/bin/sh
+
+set -eu
+
+case "$1 $2" in
+  "flake update")
+    printf '\n# candidate %s\n' "${DOTFILES_TEST_CANDIDATE:-1}" >>flake.lock
+    ;;
+  "flake check")
+    ;;
+  "build --no-link")
+    case " $* " in
+      *" --print-out-paths "*)
+        printf '%s\n' "$TMPDIR/mock-activation"
+        ;;
+    esac
+    ;;
+  "store diff-closures")
+    ;;
+  *)
+    echo "unexpected nix invocation: $*" >&2
+    exit 1
+    ;;
+esac

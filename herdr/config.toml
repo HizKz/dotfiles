@@ -4,6 +4,14 @@ onboarding = false
 shell_mode = "auto"
 new_cwd = "follow"
 
+[ui]
+# 入力待ちのAgentを優先し、分割PaneにもAgent名を表示する。
+agent_panel_sort = "priority"
+show_agent_labels_on_pane_borders = true
+
+[ui.sidebar.agents]
+rows = [["state_icon", "agent", "state_text"], ["workspace", "tab", "pane"]]
+
 [ui.sound]
 enabled = false
 
@@ -39,4 +47,9 @@ name = "terminal"
 auto_switch = false
 
 [ui.toast]
-delivery = "off"
+# バックグラウンドのAgentの完了・入力待ちをHerdr内で通知する。
+delivery = "herdr"
+delay_seconds = 1
+
+[ui.toast.herdr]
+position = "bottom-right"

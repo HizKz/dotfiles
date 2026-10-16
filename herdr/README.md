@@ -1,31 +1,35 @@
 # Herdr運用ガイド
 
-この環境では、WezTermを端末エミュレーター、Herdrを日常のワークスペース、
-タブ、ペイン管理に使用します。WezTermを起動すると、Home Managerで導入した
-`~/.nix-profile/bin/herdr`が自動的に起動し、デフォルトセッションへ接続します。
+この環境では、普段の作業にWezTermのタブ、ペインとログインzshを使用します。
+セッションを残したい作業では、Home Managerで導入したHerdrをシェルから
+`herdr`で起動し、デフォルトセッションへ接続します。
 
 ## WezTermとの役割分担
 
 | 階層 | 用途 | 例 |
 | --- | --- | --- |
 | WezTermのウィンドウ | ローカル環境や別マシンなど大きな実行環境の境界 | ローカル、SSH先 |
-| WezTermのタブ | Herdrの復旧、一時的な素のシェル | ログインzsh |
+| WezTermのタブ・ペイン | 普段の作業、必要に応じたHerdrへの接続 | ログインzsh、`herdr` |
 | HerdrのWorkspace | プロジェクト単位 | `dotfiles`、`api`、`frontend` |
 | HerdrのTab | 作業目的 | `agent`、`server`、`tests` |
 | HerdrのPane | 個別プロセス | Codex、開発サーバー、テスト監視 |
 
-通常の作業ではWezTermのタブを増やさず、HerdrのWorkspace、Tab、Paneを
-使用します。`Ctrl+t`または`Cmd+t`は、Herdr外で確認や復旧を行うための
-ログインzshを新しいWezTermタブで開きます。
+通常の作業ではWezTermのタブ、ペインを使用します。`Ctrl+t`または`Cmd+t`は、
+ログインzshを新しいWezTermタブで開きます。Herdrへ接続した場合は、その中の
+Workspace、Tab、Paneを`Ctrl+b`から操作します。
 
 ## 起動と復旧
 
-WezTermを通常どおり起動するとHerdrが開きます。シェルから明示的に接続する
-場合は次を実行します。
+WezTermを起動するとログインzshが開きます。Herdrを使う場合は、シェルから
+次を実行します。
 
 ```sh
 herdr
 ```
+
+ghq管理リポジトリをHerdrのWorkspaceで開く`wproj`は、起動済みのHerdrサーバーが
+必要です。初回は`herdr`を起動し、`Ctrl+b` → `q`でシェルへ戻ってから`wproj`を
+実行します。普段のシェルでリポジトリへ移動する場合は`cproj`を使用します。
 
 Herdrが起動できない場合は、`Ctrl+t`または`Cmd+t`で素のzshを開き、
 インストール先と設定を確認します。WezTermの外から復旧用ウィンドウを
@@ -80,9 +84,27 @@ Named Sessionを使用します。
 
 ### Agent
 
+Agent一覧は注意が必要な状態を優先する`priority`順で表示します。
+各Agentの1行目に状態アイコン、Agent名、状態名を、2行目にWorkspace、Tab、
+Pane名を表示します。分割Paneの枠にも、手動のPane名がない場合はAgent名を
+表示します。
+
+| 状態 | 意味 |
+| --- | --- |
+| `blocked` | 承認や回答など、ユーザーの入力を待っている |
+| `working` | Agentが作業中 |
+| `done` | 作業完了をまだ確認していない |
+| `idle` | 完了を確認済みで、次の入力を待っている |
+| `unknown` | 通常のシェルなど、Agentの状態を判定できない |
+
+バックグラウンドのAgentが完了したり入力待ちになったりすると、1秒の遅延後に
+Herdr内の右下へ通知を表示します。通知音は無効です。この設定はHerdr内の通知で、
+Herdrをデタッチしている間や別アプリを見ている間のデスクトップ通知は行いません。
+
 | キー | 動作 |
 | --- | --- |
 | `Ctrl+b` → `Shift+1`〜`9` | 番号を指定してAgentへ移動する |
+| `Ctrl+b` → `o` | 通知の対象へ移動する |
 
 ### Pane
 
@@ -107,10 +129,15 @@ Named Sessionを使用します。
 
 ## デタッチと終了
 
-作業を残してWezTermを閉じる場合は、`Ctrl+b` → `q`でHerdrクライアントを
-デタッチします。Pane内のAgent、サーバー、テストはバックグラウンドで
-動作し続けます。再度WezTermを開くか、シェルから`herdr`を実行すると、
-同じセッションへ戻ります。
+`Ctrl+b` → `q`でHerdrクライアントをデタッチすると、起動元のシェルへ戻ります。
+Pane内のAgent、サーバー、テストはバックグラウンドで動作し続けるため、
+その後WezTermを閉じても作業は残ります。再接続する場合は、WezTermのシェルから
+`herdr`を実行すると、同じセッションへ戻ります。
+
+デタッチや端末を閉じる操作と、PCのスリープ・再起動は別です。ローカルPCが
+スリープしている間は処理が進まず、PCやHerdrサーバーを再起動すると元の
+プロセスは終了します。再起動後は保存済みのレイアウトを復元し、対応するAgentの
+会話復元には後述のintegrationが必要です。
 
 セッションとPane内プロセスをすべて終了する場合だけ、次を実行します。
 
@@ -128,6 +155,15 @@ Herdrの設定は[`config.toml`](config.toml)で管理し、`setup.sh`によっ�
 
 ```sh
 herdr server reload-config
+```
+
+現在の設定はHerdr `0.7.4`の`herdr --default-config`と`herdr config check`で
+確認しています。`herdr --help`が表示する読込先も上記のリンク先と一致します。
+サイドバーなどクライアント側の表示が切り替わらない場合は、`Ctrl+b` → `q`で
+デタッチし、`herdr`で再接続します。設定の検証は次を実行します。
+
+```sh
+herdr config check
 ```
 
 `spotify_player`などの画像対応TUIをHerdr内で使用できるよう、実験的な
@@ -151,3 +187,12 @@ Agentの検出や状態表示を確認する場合は次を使用します。
 ```sh
 herdr agent list
 ```
+
+## 参考資料
+
+- [参考記事: 「Herdr」を使い始めたら、もう他のターミナルには戻れなくなった](https://zenn.dev/dragon1208/articles/45708cc45a7a7c)
+- [公式設定ガイド](https://herdr.dev/docs/configuration/)
+- [公式セッション復元ガイド](https://herdr.dev/docs/session-state/)
+
+記事で紹介されているエージェント操作用Skillは、状態表示や通知の前提では
+ありません。Codex integrationも別の機能で、会話の識別・復元情報を連携します。
