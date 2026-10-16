@@ -22,6 +22,27 @@ readlink ~/.config/karabiner
 jq empty ~/.config/karabiner/karabiner.json
 ```
 
+## Spaceレイヤーの呼び出し操作
+
+`o24`プロファイルで、Spaceを先に押したまま次のキーを押す。
+文字はKarabiner変換後のo24入力文字を指す。
+
+| キー | 動作 |
+| --- | --- |
+| `Space+w` | WezTermを起動する。起動済みなら前面へ移す |
+| `Space+p` | 範囲をドラッグして画面をクリップボードへコピーする（`Ctrl+Cmd+Shift+4`） |
+
+`w`はQWERTY物理`u`の位置にある。設定の`from.key_code`にはo24入力の
+`w`を記述する。追加した呼び出し操作は修飾キーなしで有効になり、
+長押しによる繰り返し起動を無効にしている。
+
+`p`はQWERTY物理`p`の位置にある。画面クリップはキーを離してから範囲を
+ドラッグし、取り込み後に`Cmd+v`で貼り付ける。選択中は`Esc`でキャンセルできる。
+`Space+c`は既存の数字`2`入力として残している。
+
+WezTermはKarabinerの`software_function.open_application`で、
+bundle identifier `com.github.wez.wezterm`を指定して呼び出す。
+
 ## 新しいキーボードをo24へ追加する
 
 新しいキーボードを接続してから、次のコマンドを実行する。

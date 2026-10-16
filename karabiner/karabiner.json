@@ -22,6 +22,45 @@
                                         "value": 1
                                     }
                                 ],
+                                "from": { "key_code": "p" },
+                                "to": [
+                                    {
+                                        "key_code": "4",
+                                        "modifiers": ["left_control", "left_command", "left_shift"],
+                                        "repeat": false
+                                    }
+                                ],
+                                "type": "basic"
+                            },
+                            {
+                                "conditions": [
+                                    {
+                                        "name": "space_layer",
+                                        "type": "variable_if",
+                                        "value": 1
+                                    }
+                                ],
+                                "from": { "key_code": "w" },
+                                "to": [
+                                    {
+                                        "software_function": {
+                                            "open_application": {
+                                                "bundle_identifier": "com.github.wez.wezterm"
+                                            }
+                                        },
+                                        "repeat": false
+                                    }
+                                ],
+                                "type": "basic"
+                            },
+                            {
+                                "conditions": [
+                                    {
+                                        "name": "space_layer",
+                                        "type": "variable_if",
+                                        "value": 1
+                                    }
+                                ],
                                 "from": { "key_code": "l" },
                                 "to": [{ "key_code": "9" }],
                                 "type": "basic"
