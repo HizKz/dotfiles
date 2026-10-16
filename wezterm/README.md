@@ -9,11 +9,13 @@
 
 ## Herdrとの役割分担
 
-ワークスペース、タブ、ペインはHerdrで管理します。WezTermにはLeader keyを
-設定せず、`Ctrl+b`をHerdrのprefix keyとしてそのまま渡します。
-WezTermの初期タブと新しいウィンドウではHerdrが自動的に起動します。
-`Ctrl+t`または`Cmd+t`で作成する外側のタブだけは、復旧や一時作業に使う
-ログインzshを起動します。
+普段のタブ、ペインはWezTermで管理します。初期タブ、新しいウィンドウ、
+`Ctrl+t`または`Cmd+t`で作成するタブでは、ログインzshを起動します。
+分割したペインもログインzshを開きます。
+
+セッションを残したい作業では、シェルから`herdr`を実行して接続します。
+WezTermにはLeader keyを設定せず、`Ctrl+b`をHerdrのprefix keyとして
+そのまま渡します。Herdrからデタッチすると、起動元のシェルへ戻ります。
 
 詳しい使い分けとHerdrの操作方法は
 [`../herdr/README.md`](../herdr/README.md) を参照してください。
@@ -34,14 +36,14 @@ Herdrでは`Ctrl+b`を押して離してから、操作キーを押します。
 | `Ctrl+b` → `w` | Herdrのワークスペース一覧 |
 | `Ctrl+b` → `q` | Herdrからデタッチ |
 
-復旧手段として、以下に記載したWezTermのタブ・ペイン操作も残しています。
-通常の作業ではHerdr側の操作を使用します。
+通常の作業では、以下に記載したWezTermのタブ・ペイン操作を使用します。
+Herdr内のタブ・ペインを操作する場合は、上記の`Ctrl+b`から操作します。
 
 ## タブ操作
 
 | キー | 動作 |
 | --- | --- |
-| `Ctrl+t` / `Cmd+t` | ログインzshを新しい外側のタブで開く |
+| `Ctrl+t` / `Cmd+t` | ログインzshを新しいWezTermタブで開く |
 | `Ctrl+w` / `Cmd+w` | 現在のタブを閉じる |
 | `Ctrl+Tab` | 次のタブへ移動 |
 | `Ctrl+Shift+Tab` | 前のタブへ移動 |
@@ -140,5 +142,5 @@ Herdrでは`Ctrl+b`を押して離してから、操作キーを押します。
 
 ## 設定ファイル
 
-- [wezterm.lua](/Users/apple/.config/wezterm/wezterm.lua)
-- [keybinds.lua](/Users/apple/.config/wezterm/keybinds.lua)
+- [`wezterm.lua`](wezterm.lua)
+- [`keybinds.lua`](keybinds.lua)
