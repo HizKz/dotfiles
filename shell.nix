@@ -134,7 +134,8 @@ in
           fi
 
           if command -v go >/dev/null 2>&1; then
-            path+=("$(go env GOPATH)/bin")
+            # Shell startup must not download a project's Go toolchain.
+            path+=("$(GOTOOLCHAIN=local go env GOPATH)/bin")
           fi
         '')
 

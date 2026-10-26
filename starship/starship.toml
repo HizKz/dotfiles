@@ -38,6 +38,7 @@ format = "[ $output ]($style)[](fg:#a7dac9 bg:#8fceb9)"
 [custom.dir_nogit]
 command = 'printf " %s" "$(basename "$PWD")"'
 when = '! git rev-parse --is-inside-work-tree >/dev/null 2>&1'
+ignore_timeout = true
 style = "fg:#20323a bg:#a7dac9"
 format = "[ $output ]($style)[](fg:#a7dac9) "
 

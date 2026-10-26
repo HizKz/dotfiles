@@ -81,6 +81,11 @@ autosuggestion、syntax highlightingの初期化もHome Managerが行います�
 入力済み文字列に一致する履歴だけを検索します。Starshipの設定本体は従来どおり
 `setup.sh`が作成する`~/.config/starship.toml`のリンクを使用します。
 
+Goの`GOPATH/bin`をPATHへ追加する際は、`GOTOOLCHAIN=local go env GOPATH`で
+インストール済みのGoから取得します。シェル起動やペイン分割でプロジェクト指定の
+Go toolchainをダウンロードしないためです。この指定はPATH取得時だけに適用し、
+通常の`go build`や`go test`ではプロジェクトのtoolchain選択を維持します。
+
 端末や仕事環境に固有のパス、エイリアスは次のファイルへ置きます。
 
 ```text
