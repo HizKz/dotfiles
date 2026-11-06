@@ -8,7 +8,7 @@
 
 | 対象 | 管理方法 |
 | --- | --- |
-| Git、gh、ghq、fzf、Herdr、jq、lazygit、Neovim、spotify-player、Starship、Zoxide、Zsh、Oh My Zsh、delta、dotfiles CLI | Home Manager |
+| Git、gh、ghq、fzf、Herdr、jq、lazygit、marp-terminal、Neovim、spotify-player、Starship、Zoxide、Zsh、Oh My Zsh、delta、dotfiles CLI | Home Manager |
 | Neovim設定と開発ツール | Nixvim standalone package |
 | WezTerm、Karabiner、Starship、Herdr、lazygitの設定 | `setup.sh`によるシンボリックリンク |
 | GUIアプリ、Homebrew cask | Homebrew |
@@ -135,6 +135,23 @@ wproj dotfiles
 ## CLIを追加・削除する
 
 CLI一覧は`home.nix`の`home.packages`で管理します。
+
+### Marpのスライドをターミナルで見る
+
+Home Managerの反映後、WezTermで次のコマンドを実行します。
+
+```sh
+marp-terminal slides.md
+```
+
+Marp CLIで全ページを高解像度の一時PNGへ変換し、`timg`で縦横比を保ちながら
+ターミナルの表示領域に収まる大きさへ拡大して1枚ずつ表示します。
+右矢印またはEnterで次へ、左矢印で前へ移動し、Escまたはo24入力の`q`で終了します。
+画像の生成にはChrome、
+Edge、Firefoxのいずれかが必要です。ローカル画像を表示できるようMarpの
+`--allow-local-files`を有効にするため、信頼できるスライドだけを開いてください。
+Herdrのサイドバーは残るため、画面をより広く使いたい場合や画像が正しく表示
+されない場合は、WezTermの通常タブで実行します。
 
 spotify-playerはNixpkgs unstableの0.24.0を使用します。macOSではNixpkgs既定の
 全機能を有効にするとDarwin linkerが異常終了するため、`override`で補助機能を

@@ -1,6 +1,7 @@
 {
   dotfilesCli,
   herdrPackage,
+  marpTerminal,
   nixvimPackage,
   pkgsUnstable,
   ...
@@ -43,6 +44,7 @@ in
       ghq
       jq
       lazygit
+      marpTerminal
       nixvimPackage
       spotifyPlayer
       herdrPackage

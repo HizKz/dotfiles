@@ -84,12 +84,100 @@
         ];
         text = builtins.readFile ./scripts/dotfiles;
       };
+      marpTerminal = pkgsStable.writeShellApplication {
+        name = "marp-terminal";
+        runtimeInputs = with pkgsUnstable; [
+          marp-cli
+          timg
+        ];
+        text = ''
+          if [ "$#" -ne 1 ]; then
+            echo "Usage: marp-terminal SLIDES.md" >&2
+            exit 2
+          fi
+          if [ ! -f "$1" ]; then
+            echo "marp-terminal: file not found: $1" >&2
+            exit 1
+          fi
+          if [ ! -t 0 ] || [ ! -t 1 ]; then
+            echo "marp-terminal: an interactive terminal is required" >&2
+            exit 1
+          fi
+          slide_dir=$(mktemp -d)
+          trap 'rm -rf "$slide_dir"' EXIT
+          marp --allow-local-files --images png --image-scale 2 "$1" -o "$slide_dir/slide.png"
+          set -- "$slide_dir"/slide.*.png
+          if [ ! -f "$1" ]; then
+            echo "marp-terminal: no slides were generated" >&2
+            exit 1
+          fi
+          slides=("$@")
+          index=0
+          tty_state=$(stty -g)
+          stty -echo -icanon min 1 time 0
+          printf '\033[?1049h\033[?25l'
+          cleanup() {
+            if [ "''${HERDR_ENV:-}" = 1 ] && [ "''${TERM_PROGRAM:-}" = WezTerm ]; then
+              printf '\033_Ga=d,d=A,q=2;\033\134'
+            fi
+            printf '\033[2J\033[H\033[?25h\033[?1049l'
+            stty "$tty_state"
+            rm -rf "$slide_dir"
+          }
+          trap cleanup EXIT
+          image_protocol=()
+          if [ "''${HERDR_ENV:-}" = 1 ] && [ "''${TERM_PROGRAM:-}" = WezTerm ]; then
+            image_protocol=(-pk)
+          fi
+          while :; do
+            read -r rows columns < <(stty size)
+            if (( rows < 3 || columns < 1 )); then
+              echo "marp-terminal: terminal is too small" >&2
+              exit 1
+            fi
+            if [ "''${#image_protocol[@]}" -gt 0 ]; then
+              printf '\033_Ga=d,d=A,q=2;\033\134'
+            fi
+            timg "''${image_protocol[@]}" -E --clear --center --upscale \
+              -g "''${columns}x$((rows - 2))" --frames=1 "''${slides[$index]}"
+            printf '\n  %d / %d   ← previous  → / Enter next  Esc / q exit' \
+              "$((index + 1))" "''${#slides[@]}"
+            key=
+            IFS= read -rsn1 key || break
+            case "$key" in
+              "")
+                if (( index + 1 < ''${#slides[@]} )); then index=$((index + 1)); fi
+                ;;
+              q) break ;;
+              $'\033')
+                sequence=
+                IFS= read -rsn1 -t 0.15 sequence || break
+                if [ "$sequence" = '[' ] || [ "$sequence" = 'O' ]; then
+                  IFS= read -rsn1 -t 0.15 sequence || continue
+                  case "$sequence" in
+                    C) if (( index + 1 < ''${#slides[@]} )); then index=$((index + 1)); fi ;;
+                    D) if (( index > 0 )); then index=$((index - 1)); fi ;;
+                    2)
+                      IFS= read -rsn1 -t 0.15 sequence || continue
+                      if [ "$sequence" = 7 ]; then
+                        IFS= read -rsn1 -t 0.15 sequence || continue
+                        if [ "$sequence" = u ]; then break; fi
+                      fi
+                      ;;
+                  esac
+                fi
+                ;;
+            esac
+          done
+        '';
+      };
       homeConfiguration = home-manager.lib.homeManagerConfiguration {
         pkgs = pkgsStable;
         extraSpecialArgs = {
           inherit
             dotfilesCli
             herdrPackage
+            marpTerminal
             nixvimPackage
             pkgsUnstable
             ;
